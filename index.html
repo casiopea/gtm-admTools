@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="author" content="Kiyoshi Sawada">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/select2.css" rel="stylesheet" />
+    <link href="css/toastr.css" rel="stylesheet" />
+    <link rel="shortcut icon" href="./favicon.png" />
+    <script src="/socket.io/socket.io.js"></script>
+    <title id="ewd-title"></title>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+      .sidebar-nav {
+        padding: 9px 0;
+      }
+    </style>
+</head>
+<body>
+    <!-- NavBar header -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <div class="navbar-brand visible-xs" id="ewd-navbar-title-phone"></div>
+          <div class="navbar-brand hidden-xs" id="ewd-navbar-title-other"></div>
+          <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        </div>
+        <div class="navbar-collapse collapse navbar-ex1-collapse">
+          <ul class="nav navbar-nav pull-right" id="navList">
+            <li id="gde_Nav" data-header="gde">
+              <a href="#" data-toggle="tooltip" title="Global Directory Editor" id="gdeNavHref">GDE</a>
+            </li>
+            <li id="mupip_Nav" data-header="mupip" style="display: none">
+              <a href="#" data-toggle="tooltip" title="M Peripheral Interchange Program" id="mupipNavHref">MUPIP</a>
+            </li>
+            <li id="lke_Nav" data-header="lke" style="display: none">
+              <a href="#" data-toggle="tooltip" title="M Lock Utility" id="lkeNavHref">LKE</a>
+            </li>
+            <li id="SysUtils_Parent" class="dropdown">   <!-- Sys Utils Menu -->
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" id="mnuSysUtilsHref" data-toggle="tooltip" title="System Utilities">Sys Utils <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu" id="mnuSysUtils">
+                    <li id="FreeCnt_Nav" data-header="FreeCnt">
+                      <a href="#" data-toggle="tooltip" title="free blocks in the database files" id="FreeCntNavHref">%FREECNT</a>
+                    </li>
+                    <li id="GtmEnv_Nav" data-header="GtmEnv">
+                      <a href="#" data-toggle="tooltip" title="GT.M environment variables" id="GtmEnvNavHref">GTM env</a>
+                    </li>
+                    <li id="DseWarp_Nav" data-header="DseWarp">
+                      <a href="#" data-toggle="tooltip" title="dumping the database file header" id="DseWarpNavHref">%DSEWRAP</a>
+                    </li>
+                </ul>
+            </li>
+            <li id="about_Nav" data-header="about">
+              <a href="#" data-toggle="tooltip" title="About this system" id="aboutNavHref">about</a>
+            </li>
+            <li>
+              <a href="#" id="btnLogout" data-toggle="tooltip" data-placement="bottom" title=" user Logout">
+                <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- Main body -->
+    <div id="content">
+      <div id="gde_Container" class="container in" style="display: none"></div>
+      <div id="mupip_Container" class="container collapse"></div>
+      <div id="lke_Container" class="container collapse"></div>
+      <div id="FreeCnt_Container" class="container collapse"></div>
+      <div id="GtmEnv_Container" class="container collapse"></div>
+      <div id="DseWarp_Container" class="container collapse"></div>
+      <div id="about_Container" class="container collapse"></div>
+      <div id="fin_Container" class="container collapse"></div>
+    </div>
+    <!-- NavBar footer -->
+    <nav class="navbar navbar-default navbar-fixed-bottom">
+      <div class="container">
+        <div class="navbar-collapse collapse navbar-ex1-collapse">
+          <ul class="list-inline" id="navFootList"></ul>
+        </div>
+      </div>
+    </nav>
+    <!-- login Modal -->
+    <div id="loginModal" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+    </div>
+    <!-- logout Modal -->
+    <div id="logoutConfirmPanel" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    </div>
+    <!-- session delete Modal -->
+    <div id="deleteConfirmPanel" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/select2.js"></script>
+    <script type="text/javascript" src="js/toastr.min.js"></script>
+    <script type="text/javascript" src="/ewdjs/EWD.js"></script>
+    <script type="text/javascript" src="js/ewdBootstrap3j.js"></script>
+<!-- 
+    <script type="text/javascript" src="locale/en-us.js"></script>
+    <script type="text/javascript" src="locale/ja-jp.js"></script>
+ -->
+    <script type="text/javascript" src="app.js"></script>
+</body>
+</html>
