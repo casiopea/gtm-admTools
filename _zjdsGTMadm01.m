@@ -163,6 +163,61 @@ DSEWRAP(pid)	;
 	QUIT error
 	; Note : not $ETRAP handler
 	;--------------------------------------------------------------------
+DSEWRAP2(pid)	;
+	; DSE dump, database file header to ewd.js Array object
+	; from ewd.js : ewd.util.invokeWrapperFunction('DSEWRAP^%zjdsGTMadm01', ewd);
+	; output JSON ex.
+	;  [{"DEFAULT":0,"FIELD_NAME":"Abandoned Kills","TEMP":0}, .... ]
+	n dse,reg,fn,fn2,data,i,field,result,inputs,outputs,error
+	n columns,cout
+	merge inputs=^%zewdTemp(pid,"inputs")
+	s error=""
+	;
+	s count=0
+	s columns(count,"field")="FIELD_NAME"
+	s columns(count,"title")="FIELD_NAME"
+	d dump^%DSEWRAP("*",.dse,"","all")
+	s reg=""
+	f  s reg=$o(dse(reg)) q:reg=""  d
+	. s count=$i(count)
+	. s columns(count,"field")=reg
+	. s columns(count,"title")=reg
+	. s fn=""
+	. f  s fn=$o(dse(reg,fn)) q:fn=""  d
+	. . s field(fn)=""
+	. . s fn2=""
+	. . f  s fn2=$o(dse(reg,fn,fn2)) q:fn2=""  d
+	. . . s field(fn,fn2)=""
+	. . . s fn3=""
+	. . . f  s fn3=$o(dse(reg,fn,fn2,fn3)) q:fn3=""  d
+	. . . . s field(fn,fn2,fn3)=""
+	;
+	s fn=""
+	f i=0:1 s fn=$o(field(fn)) q:fn=""  d
+	. s reg=""
+	. f  s reg=$o(dse(reg)) q:reg=""  d
+	. . s data(i,"FIELD_NAME")=fn
+	. . s data(i,reg)=$g(dse(reg,fn))
+	. s fn2=""
+	. f  s fn2=$o(field(fn,fn2)) q:fn2=""  d
+	. . s i=$i(i)
+	. . s reg=""
+	. . f  s reg=$o(dse(reg)) q:reg=""  d
+	. . . s data(i,"FIELD_NAME")=fn_"_"_fn2
+	. . . s data(i,reg)=$g(dse(reg,fn,fn2))
+	. . s fn3=""
+	. . f  s fn3=$o(field(fn,fn2,fn3)) q:fn3=""  d
+	. . . s i=$i(i)
+	. . . s reg=""
+	. . . f  s reg=$o(dse(reg)) q:reg=""  d
+	. . . . s data(i,"FIELD_NAME")=fn_"_"_fn2_"_"_fn3
+	. . . . s data(i,reg)=$g(dse(reg,fn,fn2,fn3))
+	;
+	kill ^%zewdTemp(pid,"outputs","DseWrap")
+	merge ^%zewdTemp(pid,"outputs","DseWrap","columns")=columns
+	merge ^%zewdTemp(pid,"outputs","DseWrap","data")=data
+	QUIT error
+	;--------------------------------------------------------------------
 DSEregion(pid)	;
 	; w $$DSEregion^%nodemGTM(pid)
 	; Region List
@@ -176,6 +231,12 @@ DSEregion(pid)	;
 	merge ^%zewdTemp(pid,"outputs","DSEregion")=GV
 	QUIT error
 	;--------------------------------------------------------------------
+Test6	;
+	n pid,sucess
+	s pid=999999999
+	s sucess=$$DSEWRAP2(pid)
+	zwr ^%zewdTemp(pid,"outputs","DseWrap",:,:,:,:,:,:,:,:)
+	QUIT
 Test5	;
 	n pid,sucess
 	s pid=999999999

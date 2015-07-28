@@ -178,11 +178,11 @@ module.exports = {
       var invoke = ewd.util.invokeWrapperFunction('DSEregion^%zjdsGTMadm01', ewd);
       return invoke.results;
     },
-    // DSE wrap : invoking DSEWRAP^%zjdsGTMadm01
-    sysUtilsDseWarp: function(params, ewd) {
+    // DSE wrap2 for BootStrap-Table.wenzhixin format  : invoking DSEWRAP^%zjdsGTMadm01
+    sysUtilsDseWarp2: function(params, ewd) {
       if (!ewd.session.isAuthenticated) return;
       ewd.query = params;
-      var invoke = ewd.util.invokeWrapperFunction('DSEWRAP^%zjdsGTMadm01', ewd);
+      var invoke = ewd.util.invokeWrapperFunction('DSEWRAP2^%zjdsGTMadm01', ewd);
       return invoke.results;
     },
     // GDE Qualifier Data : invoking GDshowAll^%zjdsGTMadm01
