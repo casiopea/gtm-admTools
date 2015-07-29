@@ -13,7 +13,11 @@ EWD.application = {
     navFragments: {
       gde: { cache: true }, mupip: { cache: true }, lke:{ cache: true }, about: { cache: true }
     },
-    gdeRJSNM:{'Region': 'Region', 'Journal': 'Journal', 'Segment': 'Segment', 'Names': 'Names', 'Map': 'Map', 'MinMax': 'MinMax' },
+    gdeRJSNM:{ 'Region': 'gdeRegion', 'Journal': 'gdeJournal',
+               'Segment': 'gdeSegment', 'Names': 'gdeNames', 
+               'Map': 'gdeMap',
+               'MinMaxReg': 'gdeMaxMin-Region', 
+               'MinMaxSeg': 'gdeMaxMin-Segment' },
     Login: function(event){
         event.preventDefault();
         var username = $('#txtUsername').val();
@@ -63,8 +67,7 @@ EWD.application = {
             $.each(EWD.application.gdeRJSNM, function(key, value) {
               EWD.sockets.sendMessage({
                 type: "EWD.getFragment", 
-                params: { file: 'html/gde/gde_' + key + 'Table.html',
-                          targetId: key + 'Content' }
+                params: { file: 'html/gde/gde_' + key + 'Table.html', targetId: key + 'Content' }
               });
             });
         }
@@ -86,86 +89,35 @@ EWD.application = {
       EWD.getFragment('html/logout.html', 'logoutConfirmPanel');
       EWD.getFragment('html/balus.html', 'deleteConfirmPanel');
     },
+    gdeShowAallFormatter: function(value){
+      var field = this.field;
+      if (field == 'STDNULLCOLL' || field == 'JOURNAL' || field == 'BEFORE_IMAGE') {
+        value = value == "1" ? "Y" : "N";
+      }
+      if (field == 'INST_FREEZE_ON_ERROR' || field == 'QDBRUNDOWN') {
+        value = value == "0" ? "DISABLED" : "ABLED";
+      }
+      if (field == 'NULL_SUBSCRIPTS') {
+        value = value == "0" ? "NEVER" : "ALWAYS";
+      }
+      if (field == 'ENCRYPTION_FLAG') {
+        value = value == "0" ? "OFF" : "ON";
+      }
+      return value;
+    },
     gdeShowAall: function(event){
         EWD.sockets.sendMessage({
           type : 'GDshowAll',
           params: {},
           done: function(messageObj) {
-            var html = '';
-            if(messageObj.message.regs){
-              var regs = messageObj.message.regs;
-              $.each(regs, function(key, value) {
-                  html = '';
-                  html = html + '<tr class="table" id="gdeRegion-row-' + key +  '">';
-                  html = html + '<td>' + key + '</td>';
-                  html = html + '<td>' + regs[key].DYNAMIC_SEGMENT + '</td>';
-                  html = html + '<td>' + regs[key].COLLATION_DEFAULT + '</td>';
-                  html = html + '<td>' + regs[key].RECORD_SIZE + '</td>';
-                  html = html + '<td>' + regs[key].KEY_SIZE + '</td>';
-                  html = html + '<td>' + regs[key].NULL_SUBSCRIPTS + '</td>';
-                  html = html + '<td>' + (regs[key].STDNULLCOLL == "1" ? "Y" : "N")  + '</td>';
-                  html = html + '<td>' + (regs[key].INST_FREEZE_ON_ERROR == "0" ? "DISABLED" : "ABLED") + '</td>';
-                  html = html + '<td>' + (regs[key].QDBRUNDOWN == "0" ? "DISABLED" : "ABLED") + '</td>';
-                  html = html + '<td>' + (regs[key].JOURNAL == "1" ? "Y" : "N")    + '</td>';
-                  html = html + '</tr>';
-                  $('#gdeRegion-table tbody').append(html);
-                  if(regs[key].JOURNAL == "1"){
-                    html = '';
-                    html = html + '<tr class="table" id="gdeRegion-row-' + key +  '">';
-                    html = html + '<td>' + key + '</td>';
-                    html = html + '<td>' + regs[key].FILE_NAME + '</td>';
-                    html = html + '<td>' + (regs[key].BEFORE_IMAGE = "0" ? "N" : "Y") + '</td>';
-                    html = html + '<td>' + regs[key].ALLOCATION + '</td>';
-                    html = html + '<td>' + regs[key].EXTENSION + '</td>';
-                    html = html + '<td>' + regs[key].AUTOSWITCHLIMIT + '</td>';
-                    html = html + '</tr>';
-                    $('#gdeJournal-table tbody').append(html);
-                  }
-              });
-            }
-            if(messageObj.message.nams){
-              var nams = messageObj.message.nams;
-              $.each(nams, function(key, value) {
-                  html = '';
-                  html = html + '<tr class="table" id="gdeNames-row-' + key + '">';
-                  html = html + '<td>' + key + '</td>';
-                  html = html + '<td>' + value + '</td>';
-                  html = html + '</tr>';
-                  $('#gdeNames-table tbody').append(html);
-              });
-            }
-            if(messageObj.message.maps.data){
-              $('#gdeMap-table').bootstrapTable('destroy');
-              $('#gdeMap-table').bootstrapTable(messageObj.message.maps);
-            }
-            if(messageObj.message.MinMaxReg.data){
-              $('#gdeMaxMin-Region-table').bootstrapTable('destroy');
-              $('#gdeMaxMin-Region-table').bootstrapTable(messageObj.message.MinMaxReg);
-            }
-            if(messageObj.message.MinMaxSeg.data){
-              $('#gdeMaxMin-Segment-table').bootstrapTable('destroy');
-              $('#gdeMaxMin-Segment-table').bootstrapTable(messageObj.message.MinMaxSeg);
-            }
-            if(messageObj.message.segs){
-              var segs = messageObj.message.segs;
-              $.each(segs, function(key, value) {
-                  html = '';
-                  html = html + '<tr class="table" id="gdeSegment-row-'  + key + '">';
-                  html = html + '<td>' + key + '</td>';
-                  html = html + '<td>' + segs[key].FILE_NAME + '</td>';
-                  html = html + '<td>' + segs[key].ACCESS_METHOD + '</td>';
-                  html = html + '<td>' + segs[key].FILE_TYPE + '</td>';
-                  html = html + '<td>' + segs[key].BLOCK_SIZE + '</td>';
-                  html = html + '<td>' + segs[key].ALLOCATION + '</td>';
-                  html = html + '<td>' + segs[key].EXTENSION_COUNT + '</td>';
-                  html = html + '<td>' + segs[key].GLOBAL_BUFFER_COUNT + '</td>';
-                  html = html + '<td>' + segs[key].LOCK_SPACE + '</td>';
-                  html = html + '<td>' + segs[key].RESERVED_BYTES + '</td>';
-                  html = html + '<td>' + (segs[key].ENCRYPTION_FLAG == "0" ? "OFF" : "ON") + '</td>';
-                  html = html + '</tr>';
-                  $('#gdeSegment-table tbody').append(html);
-              });
-            }
+            var id = '';
+            $.each(EWD.application.gdeRJSNM, function(key, tid) {
+              if(messageObj.message[key].data) {
+                id = '#' + tid + '-table';
+                $(id).bootstrapTable('destroy');
+                $(id).bootstrapTable(messageObj.message[key]);
+              }
+            });
           }
         });
     },

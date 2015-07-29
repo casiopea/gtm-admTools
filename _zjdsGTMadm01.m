@@ -45,7 +45,7 @@ GDshowAll(pid)	;
 	n syntab,nams,minreg,minseg
 	n segs,regs,maxreg,maxseg
 	n tmpreg,tmpseg
-	n iii,j,l1,s1,s2,k,l,m,work
+	n iii,j,l1,s1,s2,k,l,m,work,namSharp,wJournal,mj
 	n map,mapreg,maps
 	;
     s error=""
@@ -59,35 +59,56 @@ GDshowAll(pid)	;
 	;
 	k %zgdequalifier
 	s %zgdequalifier=$ZDate($H,"YEAR/MM/DD 24:60:SS")
-	m %zgdequalifier("regs")=regs
-	m %zgdequalifier("segs")=segs
+	k work
+	s k="",l="",m=0,mj=0
+	f  s k=$o(regs(k)) q:k=""  d
+	. s work(m,"REGION")=k
+	. s l=""
+	. f  s l=$o(regs(k,l)) q:l=""  s work(m,l)=$g(regs(k,l))
+	. i $g(regs(k,"JOURNAL"))=1 d
+	. . m wJournal(mj)=work(m)
+	. . s mj=$i(mj)
+	. s m=$i(m)
+	m %zgdequalifier("Region","data")=work
+	m %zgdequalifier("Journal","data")=wJournal
+	k work,wJournal
+	s k="",l="",m=0
+	f  s k=$o(segs(k)) q:k=""  d
+	. s work(m,"SEGMENT")=k
+	. s l=""
+	. f  s l=$o(segs(k,l)) q:l=""  d
+	. . s work(m,l)=$g(segs(k,l))
+	. s m=$i(m)
+	m %zgdequalifier("Segment","data")=work
 	k work
 	s k="",m=0
 	f  s k=$o(maxreg(k)) q:k=""  d
 	. s work(m,"Region_Item")=k
-	. s work(m,"Min")=$g(minreg(k))
-	. s work(m,"Max")=$g(maxreg(k))
+	. s work(m,"Min")=$g(minreg(k)),work(m,"Max")=$g(maxreg(k))
 	. s m=$i(m)
 	m %zgdequalifier("MinMaxReg","data")=work
-	; m %zgdequalifier("maxreg")=maxreg
-	; m %zgdequalifier("minreg")=minreg
 	k work
 	s k="",l="",m=0
 	f  s l=$o(minseg("BG",l)) q:l=""  d    ;; l = Segment_Item
 	. s work(m,"Segment_Item")=l
-	. s work(m,"Min_BG")=$g(minseg("BG",l))
-	. s work(m,"Max_BG")=$g(maxseg("BG",l))
-	. s work(m,"Min_MM")=$g(minseg("MM",l))
-	. s work(m,"Max_MM")=$g(maxseg("MM",l))
+	. s work(m,"Min_BG")=$g(minseg("BG",l)),work(m,"Max_BG")=$g(maxseg("BG",l))
+	. s work(m,"Min_MM")=$g(minseg("MM",l)),work(m,"Max_MM")=$g(maxseg("MM",l))
 	. s m=$i(m)
 	m %zgdequalifier("MinMaxSeg","data")=work
-	; m %zgdequalifier("maxseg")=maxseg
-	; m %zgdequalifier("minseg")=minseg
-	m %zgdequalifier("nams")=nams
+	k work
+	s k="",l="",m=0,namSharp=""
+	f  s l=$o(nams(l)) q:l=""  d
+	. i l="#" s namSharp=l q
+	. s work(m,"GLOBAL")=l
+	. s work(m,"REGION")=$g(nams(l))
+	. s m=$i(m)
+	;s work(m,"GLOBAL")=namSharp
+	;s work(m,"REGION")=$g(nams(namSharp))
+	m %zgdequalifier("Names","data")=work
 	k work
 	s k="",m=0
 	f  s k=$o(maps(k)) q:k=""  m work(m)=maps(k) s m=$i(m)
-	m %zgdequalifier("maps","data")=work      ;; maps
+	m %zgdequalifier("Map","data")=work      ;; maps
 	;
 	kill ^%zewdTemp(pid,"outputs")
 	merge ^%zewdTemp(pid,"outputs")=%zgdequalifier

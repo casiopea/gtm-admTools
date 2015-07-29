@@ -1,15 +1,19 @@
 
   <!-- GDE Journal Table fragment -->
   <div class="table-responsive" id="gdeJournalPageLoaded">
-    <table class="table table-striped table-condensed table-hover table-condensed" id="gdeJournal-table">
+    <table data-classes="table table-striped table-condensed table-hover table-condensed" 
+           id="gdeJournal-table">
       <thead>
         <tr>
-          <th id="gdeJournal-th-REGION" data-toggle="tooltip" data-placement="top" title="" data-original-title="">Region</th>
-          <th id="gdeJournal-th-FILE_NAME" data-toggle="tooltip" data-placement="top" title="" data-original-title="">Jnl File</th>
-          <th id="gdeJournal-th-BEFORE_IMAGE" data-toggle="tooltip" data-placement="top" title="" data-original-title="">Before</th>
-          <th id="gdeJournal-th-ALLOCATION" data-toggle="tooltip" data-placement="top" title="" data-original-title="">Alloc</th>
-          <th id="gdeJournal-th-EXTENSION" data-toggle="tooltip" data-placement="top" title="" data-original-title="">Exten</th>
-          <th id="gdeJournal-th-AUTOSWITCHLIMIT" data-toggle="tooltip" data-placement="top" title="" data-original-title="">AutoSwitch</th>
+          <th id="gdeJournal-th-REGION" data-field="REGION">Region</th>
+          <th id="gdeJournal-th-FILE_NAME" data-field="FILE_NAME">Jnl File</th>
+          <th id="gdeJournal-th-BEFORE_IMAGE" 
+              data-field="BEFORE_IMAGE"
+              data-formatter="EWD.application.gdeShowAallFormatter">Before</th>
+          <th id="gdeJournal-th-BUFFER_SIZE" data-field="BUFFER_SIZE">Buff</th>
+          <th id="gdeJournal-th-ALLOCATION" data-field="ALLOCATION">Alloc</th>
+          <th id="gdeJournal-th-EXTENSION" data-field="EXTENSION">Exten</th>
+          <th id="gdeJournal-th-AUTOSWITCHLIMIT" data-field="AUTOSWITCHLIMIT">AutoSwitch</th>
         </tr>
       </thead>
       <tbody>

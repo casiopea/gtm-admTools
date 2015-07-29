@@ -9,7 +9,7 @@
               <a href="#RegionTabPane" aria-controls="RegionTabPane" role="tab" data-toggle="tab" title="Region" id="RegionTabPaneHref">Region</a>
             </li>
             <li role="presentation">
-              <a href="#JournalTabPane" aria-controls="JournalTabPane" role="tab" data-toggle="tab" title="Journal" id="JournalTabPaneHref">Journal</a>
+              <a href="#JournalTabPane" aria-controls="JournalTabPane" role="tab" data-toggle="tab" title="Journal" id="JournalTabPaneHref">Journaling</a>
             </li>
             <li role="presentation">
               <a href="#SegmentTabPane" aria-controls="SegmentTabPane" role="tab" data-toggle="tab" title="Segment" id="SegmentTabPaneHref">Segment</a>
@@ -21,7 +21,10 @@
               <a href="#MapTabPane" aria-controls="MapTabPane" role="tab" data-toggle="tab" title="Map" id="MapTabPaneHref">Map</a>
             </li>
             <li role="presentation">
-              <a href="#MinMaxTabPane" aria-controls="MinMaxTabPane" role="tab" data-toggle="tab" title="MinMax" id="MinMaxTabPaneHref">Reference MinMax</a>
+              <a href="#MinMaxRegTabPane" aria-controls="MinMaxRegTabPane" role="tab" data-toggle="tab" title="MinMaxReg" id="MinMaxRegTabPaneHref">[Ref] RegionMinMax</a>
+            </li>
+            <li role="presentation">
+              <a href="#MinMaxSegTabPane" aria-controls="MinMaxSegTabPane" role="tab" data-toggle="tab" title="MinMaxSeg" id="MinMaxSegTabPaneHref">[Ref] SegmentMinMax</a>
             </li>
           </ul>
         </div>
@@ -60,12 +63,17 @@
               </div>
             </div>
 
-            <div role="tabpanel" class="tab-pane" id="MinMaxTabPane">
+            <div role="tabpanel" class="tab-pane" id="MinMaxRegTabPane">
               <div class="panel panel-primary">
-                <div id="MinMaxContent" class="panel-body"></div>
+                <div id="MinMaxRegContent" class="panel-body"></div>
               </div>
             </div>
 
+            <div role="tabpanel" class="tab-pane" id="MinMaxSegTabPane">
+              <div class="panel panel-primary">
+                <div id="MinMaxSegContent" class="panel-body"></div>
+              </div>
+            </div>
 
           </div>
         </div>
