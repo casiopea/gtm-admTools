@@ -13,7 +13,7 @@ EWD.application = {
     navFragments: {
       gde: { cache: true }, mupip: { cache: true }, lke:{ cache: true }, about: { cache: true }
     },
-    gdeRJSNM:{'Region': 'Region', 'Journal': 'Journal', 'Segment': 'Segment', 'Names': 'Names', 'Map': 'Map' },
+    gdeRJSNM:{'Region': 'Region', 'Journal': 'Journal', 'Segment': 'Segment', 'Names': 'Names', 'Map': 'Map', 'MinMax': 'MinMax' },
     Login: function(event){
         event.preventDefault();
         var username = $('#txtUsername').val();
@@ -134,20 +134,17 @@ EWD.application = {
                   $('#gdeNames-table tbody').append(html);
               });
             }
-            if(messageObj.message.maps){
-              var maps = messageObj.message.maps;
-              $.each(maps, function(key, value) {
-                  html = '';
-                  html = html + '<tr class="table" id="gdeMap-row-'  + key + '">';
-                  html = html + '<td>' + key + '</td>';
-                  html = html + '<td>' + maps[key].From + '</td>';
-                  html = html + '<td>' + maps[key].UpTo + '</td>';
-                  html = html + '<td>' + maps[key].Region + '</td>';
-                  html = html + '<td>' + maps[key].Segment + '</td>';
-                  html = html + '<td>' + maps[key].File + '</td>';
-                  html = html + '</tr>';
-                  $('#gdeMap-table tbody').append(html);
-              });
+            if(messageObj.message.maps.data){
+              $('#gdeMap-table').bootstrapTable('destroy');
+              $('#gdeMap-table').bootstrapTable(messageObj.message.maps);
+            }
+            if(messageObj.message.MinMaxReg.data){
+              $('#gdeMaxMin-Region-table').bootstrapTable('destroy');
+              $('#gdeMaxMin-Region-table').bootstrapTable(messageObj.message.MinMaxReg);
+            }
+            if(messageObj.message.MinMaxSeg.data){
+              $('#gdeMaxMin-Segment-table').bootstrapTable('destroy');
+              $('#gdeMaxMin-Segment-table').bootstrapTable(messageObj.message.MinMaxSeg);
             }
             if(messageObj.message.segs){
               var segs = messageObj.message.segs;
@@ -201,7 +198,7 @@ EWD.application = {
           type : 'sysUtilsAbout',
           params: {},
           done: function(messageObj) {
-            console.log('sysUtilsAbout = ',messageObj.message);
+            // console.log('sysUtilsAbout = ',messageObj.message);
             var m = messageObj.message;
             var pieces = m.gtm.split(';');
             $('#buildVersion-iface').html(pieces[0]);
@@ -275,55 +272,39 @@ EWD.application = {
           }
         });
     },
+    sysUtilsDseWarpFormatter: function(value, row){
+      if(value.length>50) {
+        var icon = '<i class="glyphicon glyphicon-star" data-toggle="tooltip" data-placement="bottom" title="' + value + '"></i>';
+        value = value.substr(0,50) + ' .....' + icon;
+      }
+      return value;
+    },
     sysUtilsDseWarp: function(event){
-        EWD.sockets.sendMessage({
-          type : 'sysUtilsRegionList',
-          params: {},
-          done: function(messageObj) {
-            var html;
-            if(messageObj.message.DSEregion){
-                var regionList=messageObj.message.DSEregion;
-                $('#sysUtilsDseWarp-table thead').empty();
-                html = '';
-                html = html + '<tr class="table" id="sysUtilsDseWarp-table-head">';
-                html = html + '<th>FIELD_NAME</th>';
-                $.each(regionList, function(key, value) {
-                  html = html + '<th>' + value + '</th>';
-                });
-                html = html + '</tr>';
-                $('#sysUtilsDseWarp-table thead').append(html);
-            }
             EWD.sockets.sendMessage({
-              type : 'sysUtilsDseWarp',
+              type : 'sysUtilsDseWarp2',
               params: {},
               done: function(messageObj) {
-                var html;
                 if(messageObj.message.DseWrap){
-                    var dw = messageObj.message.DseWrap;
-                    $('#sysUtilsDseWarp-table tbody').empty();
-                    $.each(dw, function(num, fieldObj) {
-                      html = '';
-                      html = html + '<tr class="table" id="sysUtilsDseWarp-row-' + num + '">';
-                      $.each(fieldObj, function(fieldName, regObj) {
-                        html = html + '<td>' + fieldName + '</td>';
-                        $.each(regObj, function(regName, value) {
-                          var ttips = '';
-                          var str = value ;
-                          if(value.length>50) {
-                            str = value.substr(0,50) + '.....';
-                            ttips = ' data-toggle="tooltip" data-placement="bottom" title="' + value + '"';
-                          }
-                          html = html + '<td' + ttips + '>' + str + '</td>';
-                        });
-                      });
-                      html = html + '</tr>';
-                      $('#sysUtilsDseWarp-table tbody').append(html);
-                    });
+                  var columns = messageObj.message.DseWrap.columns;
+                  $.each(columns, function(key, colObj) {
+                    if (colObj.field != 'FIELD_NAME') {
+                      colObj['formatter'] = 'EWD.application.sysUtilsDseWarpFormatter';
+                      messageObj.message.DseWrap.columns[key] = colObj;
+                    }
+                  });
+                  $('#sysUtilsDseWarp-table').bootstrapTable('destroy');
+                  $('#sysUtilsDseWarp-table').bootstrapTable(messageObj.message.DseWrap);
+                  var html = '<div class="pull-left titleHeader"><h4>%DSEWRAP</h4></div>';
+                  $('#DseWarpPageLoaded .fixed-table-toolbar').append(html);
+                  var html = 
+                    '<button id="sysUtilsDseWarpReloadBtn" class="btn btn-default"' + 
+                    '  type="button" name="DseWarpReloadReLoad" title="%DSEWRAP Reload">' +
+                    '  <i class="glyphicon glyphicon-refresh icon-refresh"></i>' +
+                    '</button>';
+                  $('#DseWarpPageLoaded .fixed-table-toolbar').children('.columns-right').append(html);
                 }
               }
             });
-          }
-        });
     },
     onStartup: function() {
         toastr.options.target = 'body';
@@ -344,6 +325,7 @@ EWD.application = {
             .on('click','#logoutConfirmPanelOKBtn',EWD.application.logOut)
             .on('click','#deleteConfirmPanelOKBtn',EWD.application.sessionDeleted)
             .on('click','#FreeCntReloadBtn',EWD.application.sysUtilsFreeCount)
+            .on('click','#sysUtilsDseWarpReloadBtn',EWD.application.sysUtilsDseWarp)
         ;
     },
     onPageSwap: {

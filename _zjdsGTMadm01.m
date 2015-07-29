@@ -27,6 +27,7 @@
 GDshowAll(pid)	;
 	; GT.M Global Directory Qualifier show All for EWD.js 2015/07/26 10:12
 	; from ewd.js : ewd.util.invokeWrapperFunction('GDshowAll^%zjdsGTMadm01', ewd);
+	; zlink "_zjdsGTMadm01.m" do relink^%zewdGTM
 	n inputs,outputs,%zgdequalifier,nDev,error
 	n x,y,ver,SIZEOF,TAB,TRUE,TWO
 	n update,upper,useio,v30,v44,v532,v533,v534,v542,v550,v5ft1
@@ -44,7 +45,7 @@ GDshowAll(pid)	;
 	n syntab,nams,minreg,minseg
 	n segs,regs,maxreg,maxseg
 	n tmpreg,tmpseg
-	n iii,j,l1,s1,s2
+	n iii,j,l1,s1,s2,k,l,m,work
 	n map,mapreg,maps
 	;
     s error=""
@@ -59,13 +60,34 @@ GDshowAll(pid)	;
 	k %zgdequalifier
 	s %zgdequalifier=$ZDate($H,"YEAR/MM/DD 24:60:SS")
 	m %zgdequalifier("regs")=regs
-	m %zgdequalifier("maxreg")=maxreg
-	m %zgdequalifier("minreg")=minreg
 	m %zgdequalifier("segs")=segs
-	m %zgdequalifier("maxseg")=maxseg
-	m %zgdequalifier("minseg")=minseg
+	k work
+	s k="",m=0
+	f  s k=$o(maxreg(k)) q:k=""  d
+	. s work(m,"Region_Item")=k
+	. s work(m,"Min")=$g(minreg(k))
+	. s work(m,"Max")=$g(maxreg(k))
+	. s m=$i(m)
+	m %zgdequalifier("MinMaxReg","data")=work
+	; m %zgdequalifier("maxreg")=maxreg
+	; m %zgdequalifier("minreg")=minreg
+	k work
+	s k="",l="",m=0
+	f  s l=$o(minseg("BG",l)) q:l=""  d    ;; l = Segment_Item
+	. s work(m,"Segment_Item")=l
+	. s work(m,"Min_BG")=$g(minseg("BG",l))
+	. s work(m,"Max_BG")=$g(maxseg("BG",l))
+	. s work(m,"Min_MM")=$g(minseg("MM",l))
+	. s work(m,"Max_MM")=$g(maxseg("MM",l))
+	. s m=$i(m)
+	m %zgdequalifier("MinMaxSeg","data")=work
+	; m %zgdequalifier("maxseg")=maxseg
+	; m %zgdequalifier("minseg")=minseg
 	m %zgdequalifier("nams")=nams
-	m %zgdequalifier("maps")=maps
+	k work
+	s k="",m=0
+	f  s k=$o(maps(k)) q:k=""  m work(m)=maps(k) s m=$i(m)
+	m %zgdequalifier("maps","data")=work      ;; maps
 	;
 	kill ^%zewdTemp(pid,"outputs")
 	merge ^%zewdTemp(pid,"outputs")=%zgdequalifier
