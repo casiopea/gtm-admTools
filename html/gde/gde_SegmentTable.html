@@ -2,22 +2,64 @@
   <!-- GDE Segment Table fragment -->
   <div class="table-responsive" id="gdeSegmentPageLoaded">
     <table data-classes="table table-striped table-condensed table-hover table-condensed"
+           data-height="100"
            id="gdeSegment-table">
       <thead>
         <tr>
-          <th id="gdeSegment-th-SEGMENT" data-field="SEGMENT">Segment</th>
-          <th id="gdeSegment-th-FILE_NAME" data-field="FILE_NAME">File (def ext: .dat)</th>
-          <th id="gdeSegment-th-ACCESS_METHOD" data-field="ACCESS_METHOD">Acc</th>
-          <th id="gdeSegment-th-FILE_TYPE" data-field="FILE_TYPE">Type</th>
-          <th id="gdeSegment-th-BLOCK_SIZE" data-field="BLOCK_SIZE">Block</th>
-          <th id="gdeSegment-th-ALLOCATION" data-field="ALLOCATION">Alloc</th>
-          <th id="gdeSegment-th-EXTENSION_COUNT" data-field="EXTENSION_COUNT">Exten</th>
-          <th id="gdeSegment-th-GLOBAL_BUFFER_COUNT" data-field="GLOBAL_BUFFER_COUNT">Glob</th>
-          <th id="gdeSegment-th-LOCK_SPACE" data-field="LOCK_SPACE">Lock</th>
-          <th id="gdeSegment-th-RESERVED_BYTES" data-field="RESERVED_BYTES">Reserved</th>
+          <th id="gdeSegment-th-SEGMENT" 
+              data-halign="center"
+              data-field="SEGMENT">Segment
+          </th>
+          <th id="gdeSegment-th-FILE_NAME" 
+              data-halign="center"
+              data-field="FILE_NAME">File (def ext: .dat)
+          </th>
+          <th id="gdeSegment-th-ACCESS_METHOD" 
+              data-halign="center"
+              data-align="center"
+              data-field="ACCESS_METHOD">Acc
+          </th>
+          <th id="gdeSegment-th-FILE_TYPE" 
+              data-halign="center"
+              data-align="center"
+              data-field="FILE_TYPE">Type
+          </th>
+          <th id="gdeSegment-th-BLOCK_SIZE" 
+              data-halign="center"
+              data-align="right"
+              data-field="BLOCK_SIZE">Block
+          </th>
+          <th id="gdeSegment-th-ALLOCATION" 
+              data-halign="center"
+              data-align="right"
+              data-field="ALLOCATION">Alloc
+          </th>
+          <th id="gdeSegment-th-EXTENSION_COUNT" 
+              data-halign="center"
+              data-align="right"
+              data-field="EXTENSION_COUNT">Exten
+          </th>
+          <th id="gdeSegment-th-GLOBAL_BUFFER_COUNT" 
+              data-halign="center"
+              data-align="right"
+              data-field="GLOBAL_BUFFER_COUNT">Glob Bf Cnt
+          </th>
+          <th id="gdeSegment-th-LOCK_SPACE" 
+              data-halign="center"
+              data-align="right"
+              data-field="LOCK_SPACE">Lock
+          </th>
+          <th id="gdeSegment-th-RESERVED_BYTES" 
+              data-halign="center"
+              data-align="right"
+              data-field="RESERVED_BYTES">Reserved
+          </th>
           <th id="gdeSegment-th-ENCRYPTION_FLAG" 
+              data-halign="center"
+              data-align="center"
               data-field="ENCRYPTION_FLAG"
-              data-formatter="EWD.application.gdeShowAallFormatter" >Encrypt</th>
+              data-formatter="EWD.application.gdeShowAallFormatter" >Encrypt
+          </th>
         </tr>
       </thead>
       <tbody>

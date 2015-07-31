@@ -33,6 +33,9 @@
       .sidebar-nav {
         padding: 9px 0;
       }
+      #lkeShowAll-table tbody {
+        cursor: pointer
+      }
     </style>
 </head>
 <body>
@@ -53,11 +56,14 @@
             <li id="gde_Nav" data-header="gde">
               <a href="#" data-toggle="tooltip" title="Global Directory Editor" id="gdeNavHref">GDE</a>
             </li>
-            <li id="mupip_Nav" data-header="mupip" style="display: none">
+            <li id="mupip_Nav" data-header="mupip" class="disabled">
               <a href="#" data-toggle="tooltip" title="M Peripheral Interchange Program" id="mupipNavHref">MUPIP</a>
             </li>
-            <li id="lke_Nav" data-header="lke" style="display: none">
+            <li id="lke_Nav" data-header="lke">
               <a href="#" data-toggle="tooltip" title="M Lock Utility" id="lkeNavHref">LKE</a>
+            </li>
+            <li id="dse_Nav" data-header="dse">
+              <a href="#" data-toggle="tooltip" title="Database Structure Editor" id="dseNavHref">DSE</a>
             </li>
             <li id="SysUtils_Parent" class="dropdown">   <!-- Sys Utils Menu -->
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" id="mnuSysUtilsHref" data-toggle="tooltip" title="System Utilities">Sys Utils <span class="caret"></span></a>
@@ -67,9 +73,6 @@
                     </li>
                     <li id="GtmEnv_Nav" data-header="GtmEnv">
                       <a href="#" data-toggle="tooltip" title="GT.M environment variables" id="GtmEnvNavHref">GTM env</a>
-                    </li>
-                    <li id="DseWarp_Nav" data-header="DseWarp">
-                      <a href="#" data-toggle="tooltip" title="dumping the database file header" id="DseWarpNavHref">%DSEWRAP</a>
                     </li>
                 </ul>
             </li>
@@ -86,15 +89,15 @@
       </div>
     </nav>
     <!-- Main body -->
-    <div id="content">
+    <div id="content" style="height: 100%;">
       <div id="gde_Container" class="container in" style="display: none"></div>
-      <div id="mupip_Container" class="container collapse"></div>
-      <div id="lke_Container" class="container collapse"></div>
-      <div id="FreeCnt_Container" class="container collapse"></div>
-      <div id="GtmEnv_Container" class="container collapse"></div>
-      <div id="DseWarp_Container" class="container collapse"></div>
-      <div id="about_Container" class="container collapse"></div>
-      <div id="fin_Container" class="container collapse"></div>
+      <div id="mupip_Container" class="container collapse" style="height: 100%;"></div>
+      <div id="lke_Container" class="container collapse" style="height: 100%;"></div>
+      <div id="FreeCnt_Container" class="container collapse" style="height: 100%;"></div>
+      <div id="GtmEnv_Container" class="container collapse" style="height: 100%;"></div>
+      <div id="dse_Container" class="container collapse" style="height: 100%;"></div>
+      <div id="about_Container" class="container collapse" style="height: 100%;"></div>
+      <div id="fin_Container" class="container collapse" style="height: 100%;"></div>
     </div>
     <!-- NavBar footer -->
     <nav class="navbar navbar-default navbar-fixed-bottom">
@@ -104,6 +107,9 @@
         </div>
       </div>
     </nav>
+    <!-- LKE tbody click fire Modal -->
+    <div id="lkeClearConfirmModal" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="lkeClearConfirmModalLabel" aria-hidden="true">
+    </div>
     <!-- login Modal -->
     <div id="loginModal" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
     </div>

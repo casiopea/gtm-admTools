@@ -90,6 +90,107 @@ var ewdjsBuild = function(){
   }
   return 'EWD.js build ' + buildNo.split(':')[1].trim() + buildDate.split("'")[1];
 };
+var lkeShowAll = function(params, ewd, regions){
+    var command = process.env.gtm_dist + "/lke show -all";
+    var child = exec(command,
+        function (error, stdout, stderr){
+            if(stdout.toString()){
+                console.log('*******************************');
+                console.log('stdout = ',stdout.toString());
+                console.log('*******************************');
+            }
+            if(stderr.toString()){
+                var line = stderr.toString().split('\n');
+                var lkSp = '';
+                var reg = '';
+                var inPid;
+                var rArr = [];
+                var pid = 0;
+                var varName = '';
+                var contFlg = false;
+                for(var i=0; i < line.length; i++){
+                  if (line[i] == '') continue;
+                  if (regions.indexOf(line[i]) > -1) {
+                    reg = line[i];
+                    continue;
+                  }
+                  if (line[i].match(/^\%GTM-I-LOCKSPACEUSE/)) {
+                    lkSp = line[i].split(',')[1].trim();
+                    continue;
+                  }
+
+                  if (contFlg) {
+                    if (line[i].match(/^\s*Owned/)) {
+                      pid = line[i].split("Owned by PID=")[1].trim().split(/\s/)[0].trim();
+                      contFlg = false;
+                    }
+                  } else {
+                    inPid = line[i].split("Owned by PID=");
+                    if ( typeof inPid[1] != 'undefined' ) {
+                      varName = line[i].split("Owned by PID=")[0].trim();
+                      pid = line[i].split("Owned by PID=")[1].trim().split(/\s/)[0].trim();
+                    } else {
+                      varName = line[i].trim();
+                      contFlg = true;
+                    }
+                  }
+                  if (!contFlg){
+                    rArr.push({
+                                Region: reg,
+                                PID: pid,
+                                varName: varName
+                              });
+                  }
+                }
+                ewd.sendWebSocketMsg({
+                    type: 'lkeShowAll',
+                    message: 
+                        {
+                            status: 'stderr',
+                            result: stderr.toString(),
+                            lockArray: rArr,
+                            LOCKSPACEUS: lkSp
+                        }
+                });
+            }
+            if(error){
+                console.log('*******************************');
+                console.log('error = ',error);
+                console.log('*******************************');
+            }
+        });
+};
+var lkeClearExe = function(params, ewd) {
+    var command = '';
+    var value = params.value.trim();
+    if (params.type == 'Region')  command = 'lke clear -REGION=' + value + ' -NOINTERACTIVE';
+    if (params.type == 'PID')     command = 'lke clear -PID=' + value + ' -NOINTERACTIVE';
+    if (params.type == 'varName') command = "lke clear -LOCK='" + value + "' -NOINTERACTIVE" ;
+    var child = exec(process.env.gtm_dist + '/' + command ,
+        function (error, stdout, stderr){
+            if(stdout.toString()){
+                console.log('*******************************');
+                console.log('stdout = ',stdout.toString());
+                console.log('*******************************');
+            }
+            if(stderr.toString()){
+                console.log('stderr = ',stderr.toString());
+                ewd.sendWebSocketMsg({
+                    type: 'lkeClear',
+                    message: 
+                        {
+                            status: 'stderr',
+                            result: stderr.toString(),
+                        }
+                });
+              }
+            if(error){
+                console.log('*******************************');
+                console.log('error = ',error);
+                console.log('*******************************');
+            }
+        });
+};
 
 module.exports = {
 
@@ -147,6 +248,18 @@ module.exports = {
             authenticated: true
         };
     },
+    // Lock Utility lke show all
+    lkeShowAll: function(params,ewd) {
+      if (!ewd.session.isAuthenticated) return;
+      ewd.query = params;
+      var invoke = ewd.util.invokeWrapperFunction('DSEregion^%zjdsGTMadm01', ewd);
+      lkeShowAll(params, ewd, invoke.results.DSEregion);
+    },
+    // Lock Utility lke clear
+    lkeClear: function(params,ewd) {
+      if (!ewd.session.isAuthenticated) return;
+      lkeClearExe(params, ewd);
+    },
     // process environment
     sysUtilsGtmEnv: function(params, ewd) {
       if (!ewd.session.isAuthenticated) return;
@@ -178,8 +291,8 @@ module.exports = {
       var invoke = ewd.util.invokeWrapperFunction('DSEregion^%zjdsGTMadm01', ewd);
       return invoke.results;
     },
-    // DSE wrap2 for BootStrap-Table.wenzhixin format  : invoking DSEWRAP^%zjdsGTMadm01
-    sysUtilsDseWarp2: function(params, ewd) {
+    // DSE wrap for BootStrap-Table.wenzhixin format  : invoking DSEWRAP2^%zjdsGTMadm01
+    dseWarp: function(params, ewd) {
       if (!ewd.session.isAuthenticated) return;
       ewd.query = params;
       var invoke = ewd.util.invokeWrapperFunction('DSEWRAP2^%zjdsGTMadm01', ewd);

@@ -59,54 +59,39 @@ GDshowAll(pid)	;
 	;
 	k %zgdequalifier
 	s %zgdequalifier=$ZDate($H,"YEAR/MM/DD 24:60:SS")
-	k work
-	s k="",l="",m=0,mj=0
+	k work,wJournal  s k="",l="",m=0,mj=0      ;; Region, Journal
 	f  s k=$o(regs(k)) q:k=""  d
 	. s work(m,"REGION")=k
-	. s l=""
-	. f  s l=$o(regs(k,l)) q:l=""  s work(m,l)=$g(regs(k,l))
-	. i $g(regs(k,"JOURNAL"))=1 d
-	. . m wJournal(mj)=work(m)
-	. . s mj=$i(mj)
+	. s l="" f  s l=$o(regs(k,l)) q:l=""  s work(m,l)=$g(regs(k,l))
+	. i $g(regs(k,"JOURNAL"))=1 m wJournal(mj)=work(m) s mj=$i(mj)
 	. s m=$i(m)
-	m %zgdequalifier("Region","data")=work
-	m %zgdequalifier("Journal","data")=wJournal
-	k work,wJournal
-	s k="",l="",m=0
+	m %zgdequalifier("Region","data")=work,%zgdequalifier("Journal","data")=wJournal
+	k work,wJournal s k="",l="",m=0            ;; Segment
 	f  s k=$o(segs(k)) q:k=""  d
 	. s work(m,"SEGMENT")=k
-	. s l=""
-	. f  s l=$o(segs(k,l)) q:l=""  d
-	. . s work(m,l)=$g(segs(k,l))
+	. s l="" f  s l=$o(segs(k,l)) q:l=""  s work(m,l)=$g(segs(k,l))
 	. s m=$i(m)
 	m %zgdequalifier("Segment","data")=work
-	k work
-	s k="",m=0
+	k work s k="",m=0                          ;; MinMaxReg
 	f  s k=$o(maxreg(k)) q:k=""  d
 	. s work(m,"Region_Item")=k
 	. s work(m,"Min")=$g(minreg(k)),work(m,"Max")=$g(maxreg(k))
 	. s m=$i(m)
 	m %zgdequalifier("MinMaxReg","data")=work
-	k work
-	s k="",l="",m=0
-	f  s l=$o(minseg("BG",l)) q:l=""  d    ;; l = Segment_Item
+	k work s k="",l="",m=0                     ;; MinMaxSeg
+	f  s l=$o(minseg("BG",l)) q:l=""  d
 	. s work(m,"Segment_Item")=l
 	. s work(m,"Min_BG")=$g(minseg("BG",l)),work(m,"Max_BG")=$g(maxseg("BG",l))
 	. s work(m,"Min_MM")=$g(minseg("MM",l)),work(m,"Max_MM")=$g(maxseg("MM",l))
 	. s m=$i(m)
 	m %zgdequalifier("MinMaxSeg","data")=work
-	k work
-	s k="",l="",m=0,namSharp=""
+	k work s k="",l="",m=0,namSharp=""         ;; Names
 	f  s l=$o(nams(l)) q:l=""  d
 	. i l="#" s namSharp=l q
-	. s work(m,"GLOBAL")=l
-	. s work(m,"REGION")=$g(nams(l))
-	. s m=$i(m)
-	;s work(m,"GLOBAL")=namSharp
-	;s work(m,"REGION")=$g(nams(namSharp))
+	. s work(m,"GLOBAL")=l,work(m,"REGION")=$g(nams(l)),m=$i(m)
+	;s work(m,"GLOBAL")=namSharp,work(m,"REGION")=$g(nams(namSharp))
 	m %zgdequalifier("Names","data")=work
-	k work
-	s k="",m=0
+	k work s k="",m=0                          ;; Map
 	f  s k=$o(maps(k)) q:k=""  m work(m)=maps(k) s m=$i(m)
 	m %zgdequalifier("Map","data")=work      ;; maps
 	;
@@ -150,14 +135,14 @@ FreeBlock(pid)	;
 	s error=""
 	merge inputs=^%zewdTemp(pid,"inputs")
 	s rn=""
-	f i=1:1 s rn=$view("gvnext",rn) q:rn=""  d
+	f i=0:1 s rn=$view("gvnext",rn) q:rn=""  d
 	. s result(i,"Region")=rn
 	. s (fb,result(i,"Free"))=$v("FREEBLOCKS",rn)
 	. s (tb,result(i,"Total"))=$v("TOTALBLOCKS",rn)
-	. s result(i,"Percentage")=fb/tb*100.0                ;;;$j(fb/tb*100.0,6,2)
+	. s result(i,"Percentage")=$fn(fb/tb*100.0,"",2)  ;; w $FNumber(x,"",2) $j(fb/tb*100.0,6,2)
 	. s result(i,"Database_file")=$v("GVFILE",rn)
 	kill ^%zewdTemp(pid,"outputs","FreeBlock")
-	merge ^%zewdTemp(pid,"outputs","FreeBlock")=result
+	merge ^%zewdTemp(pid,"outputs","FreeBlock","data")=result
 	QUIT error
 	;--------------------------------------------------------------------
 DSEWRAP(pid)	;
@@ -269,7 +254,7 @@ DSEregion(pid)	;
 	n GV,inputs,outputs,error
 	s error=""
 	merge inputs=^%zewdTemp(pid,"inputs")
-	s GV="" f i=1:1 s GV=$VIEW("GVNEXT",GV) q:GV=""  s GV(i)=GV
+	s GV="" f i=0:1 s GV=$VIEW("GVNEXT",GV) q:GV=""  s GV(i)=GV
 	kill ^%zewdTemp(pid,"outputs","DSEregion")
 	merge ^%zewdTemp(pid,"outputs","DSEregion")=GV
 	QUIT error
