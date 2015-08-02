@@ -1,0 +1,110 @@
+
+<div class="row" id="mupipExtractPageLoaded">
+
+  <div class="row"> 
+    <div class="col-xs-12">
+      <div class="col-xs-4">
+        <div class="well well-sm well-Format-Select" style="margin-bottom: 10px;">
+            <div class="form-inline">
+              <label id="mupipExtraFmtHead">Output Format</label>
+            </div>
+            <div class="radio-inline">
+              <label>
+                <input type="radio" name="mupipExtraFormat" 
+                       id="mupipExtraFormat-go" value="go" />Global Out
+              </label>
+            </div>
+            <div class="radio-inline">
+              <label>
+                <input type="radio" name="mupipExtraFormat" 
+                       id="mupipExtraFormat-bin" value="bin" />Binary
+              </label>
+            </div>
+            <div class="radio-inline">
+              <label>
+                <input type="radio" name="mupipExtraFormat" checked
+                       id="mupipExtraFormat-zwr" value="zwr" />ZWR
+              </label>
+            </div>
+        </div>
+        <div class="well well-sm well-Label-Text" style="margin-bottom: 10px;">
+          <label for="mupipExtraLabel" id="mupipExtraLabelHead">Label Text</label>
+          <input type="text" class="form-control" 
+                 id="mupipExtraLabel" 
+                 placeholder="Text that becomes first record in output." />
+        </div>
+        <div class="well well-sm well-Selector" style="margin-bottom: 10px;">
+            <div class="form-inline">
+              <label id="mupipExtraOpeHead">Output Selector</label>
+            </div>
+            <div class="form-inline">
+              <label>
+                <input type="radio" name="mupipExtraOpe"
+                       id="mupipExtraOpeReg" value="Reg" />Region&nbsp;&nbsp;
+              </label>
+                <input type="hidden" style="width: 180px;"
+                       name="mupipExtraRegionSelect"
+                       id="mupipExtraRegionSelect" />
+            </div>
+            <div class="form-inline">
+              <label>
+                <input type="radio" name="mupipExtraOpe"
+                       id="mupipExtraOpeGlb" value="Glb" />Global
+              </label>
+            </div>
+            <div class="form-inline">
+              <label>
+                <input type="radio" name="mupipExtraOpe" checked
+                       id="mupipExtraOpeAll" value="All" />ALL( -Select=* )
+              </label>
+            </div>
+        </div>
+        <div class="well well-sm well-FileName" style="margin-bottom: 10px;">
+          <label for="mupipExtraFileName" id="mupipExtraFileNameHead">
+            Output file-name (* must)
+          </label>
+          <input type="text" class="form-control" 
+                 id="mupipExtraFileName" 
+                 placeholder="output to a UNIX file" />
+        </div>
+        <div class="well well-sm well-Other" style="margin-bottom: 10px;">
+            <div class="form-inline">
+              <label id="mupipExtraOthHead">Other params</label>
+            </div>
+            <div class="checkbox-inline">
+              <label>
+                <input type="checkbox" name="mupipExtraLog" checked
+                       id="mupipExtraLog" value="log" />Log
+              </label>
+            </div>
+            <div class="checkbox-inline">
+              <label>
+                <input type="checkbox" name="mupipExtraFreeze"
+                       id="mupipExtraFreeze" value="freeze" />Freeze
+              </label>
+            </div>
+        </div>
+      </div>
+      <div class="col-xs-8">
+        <div class="well well-sm well-Global" id="mupipExtraGlobalSelector"
+             style="margin-bottom: 10px; display: none">
+            <div class="form-group">
+              <label for="mupipExtraGlobalInput" id="mupipExtraGlobalInputHead">
+                Select globals
+              </label>
+              <input type="text" class="form-control" 
+                     id="mupipExtraGlobalInput" 
+                     placeholder="Select globals" />
+            </div>
+            <div class="form-group">
+              <label for="mupipExtraGlobalList" id="mupipExtraGlobalListHead">
+                Global LIst
+              </label>
+
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

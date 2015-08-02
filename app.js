@@ -15,6 +15,8 @@ EWD.application = {
     },
     maxlkeResultPreAreaLength: 500,
     lkeClearParams: {},
+    regionList: {},
+    regionSelect2: [],
     gdeRJSNM:{ 'Region': 'gdeRegion', 'Journal': 'gdeJournal',
                'Segment': 'gdeSegment', 'Names': 'gdeNames', 
                'Map': 'gdeMap',
@@ -69,16 +71,17 @@ EWD.application = {
             $.each(EWD.application.gdeRJSNM, function(key, value) {
               EWD.sockets.sendMessage({
                 type: "EWD.getFragment", 
-                params: { file: 'html/gde/gde_' + key + 'Table.html', targetId: key + 'Content' }
+                params: { file: 'html/gde/gde_' + key + 'Table.html', 
+                          targetId: key + 'Content' }
               });
             });
         }
       });
       EWD.sockets.sendMessage({
         type: "EWD.getFragment", 
-        params:  { file: 'html/mupip/mupip_navTab.html', targetId: 'mupip_Container' }
+        params:  { file: 'html/mupip/mupip_Extract.html',
+                   targetId: 'mupipExtract_Container' }
       });
-
       EWD.getFragment('html/lke/lke.html', 'lke_Container'); 
       EWD.getFragment('html/lke/lkeClearConfirm.html', 'lkeClearConfirmModal'); 
       EWD.getFragment('html/dse/dse.html', 'dse_Container'); 
@@ -122,6 +125,20 @@ EWD.application = {
               $(id).bootstrapTable(messageObj.message[key]);
             }
           });
+        }
+      });
+    },
+    sysUtilsRegionList: function(event){
+      EWD.sockets.sendMessage({
+        type : 'sysUtilsRegionList',
+        params: {},
+        done: function(messageObj) {
+          EWD.application.regionList = messageObj.message.DSEregion;
+          $.each(messageObj.message.DSEregion, function(key, obj) {
+            EWD.application.regionSelect2.push( {id: key, text: obj} );
+          });
+          // console.log('EWD.application.regionList = ',EWD.application.regionList);
+          // console.log('EWD.application.regionSelect2 = ',EWD.application.regionSelect2);
         }
       });
     },
@@ -342,6 +359,24 @@ EWD.application = {
           backdrop: 'static'
       });
     },
+    mupipExtractInit: function(event){
+      $('#mupipExtraRegionSelect').select2({ data: EWD.application.regionSelect2 });
+      $('#mupipExtraRegionSelect').select2("enable", false);
+    },
+    mupipExtraOpeChange: function(value) {
+      if( value == 'Reg'){
+        $('#mupipExtraGlobalSelector').hide();
+        $('#mupipExtraRegionSelect').select2("enable", true);
+      }
+      if( value == 'Glb'){
+        $('#mupipExtraGlobalSelector').show();
+        $('#mupipExtraRegionSelect').select2("enable", false);
+      }
+      if( value == 'All'){
+        $('#mupipExtraGlobalSelector').hide();
+        $('#mupipExtraRegionSelect').select2("enable", false);
+      }
+    },
     onStartup: function() {
         toastr.options.target = 'body';
         EWD.application.initFragment();
@@ -364,7 +399,11 @@ EWD.application = {
             .on('click','#lkeShowReloadBtn',EWD.application.lkeShowAll)
             .on('click','#lkeClearConfirmOKBtn',EWD.application.lkeClearExe)
             .on('click','#sysUtilsFreeCntReloadBtn',EWD.application.sysUtilsFreeCount)
+            .on('click','input[name="mupipExtraOpe"]', function(){
+                EWD.application.mupipExtraOpeChange($(this).val());
+            })
         ;
+
     },
     onPageSwap: {
     },
@@ -382,12 +421,14 @@ EWD.application = {
             // var mess = locale.tooltip.btnLogout ? locale.tooltip.btnLogout : ' user Logout (Ctrl+Q)';
             var mess = ' user Logout';
             $('#btnLogout').attr('title',EWD.application.username + mess);
+            EWD.application.sysUtilsRegionList();
             EWD.application.gdeShowAall();
             EWD.application.sysUtilsFreeCount();
             EWD.application.sysUtilsAbout();
             EWD.application.sysUtilsGtmEnv();
             EWD.application.dseDumpAll();
             EWD.application.lkeShowAll();
+            EWD.application.mupipExtractInit();
           }else{
             // var mess = locale.alert.Login ? locale.alert.Login : 'error!';
             var mess = 'error!';
