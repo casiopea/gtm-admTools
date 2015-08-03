@@ -86,21 +86,47 @@
         </div>
       </div>
       <div class="col-xs-8">
-        <div class="well well-sm well-Global" id="mupipExtraGlobalSelector"
-             style="margin-bottom: 10px; display: none">
+        <div id="mupipExtraGlobalSelector" style="display: none">
             <div class="form-group">
               <label for="mupipExtraGlobalInput" id="mupipExtraGlobalInputHead">
                 Select globals
               </label>
-              <input type="text" class="form-control" 
-                     id="mupipExtraGlobalInput" 
-                     placeholder="Select globals" />
+              <div class="input-group">
+                  <input type="text" class="form-control" 
+                         id="mupipExtraGlobalInput" 
+                         aria-describedby="mupipExtraGlobalInput-addon"  
+                         placeholder="Select globals" />
+                  <!-- Submit, Global Select strings submit -->
+                  <span class="input-group-addon" id="mupipExtraGlobalInput-addon3">
+                    <button id="mupipExtraGlobalSubmit" 
+                            class="btn btn-default btn-xs"
+                            type="button" name="mupipExtraGlobalSubmit" 
+                            title="Checking, input text of Global Select">
+                      <i class="glyphicon glyphicon-check icon-check"></i>
+                    </button>
+                  </span>
+                  <!-- Reload, global list reload  -->
+                  <span class="input-group-addon" id="mupipExtraGlobalInput-addon">
+                    <button id="mupipExtraGlobalReloadBtn" 
+                            class="btn btn-default btn-xs"
+                            type="button" name="mupipExtraGlobalReLoad" 
+                            title="Reset Global List">
+                      <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                    </button>
+                  </span>
+                  <!-- Question, How to global selecter strings -->
+                  <span class="input-group-addon" id="mupipExtraGlobalInput-addon2">
+                    <button id="mupipExtraGlobalQABtn" 
+                            class="btn btn-default btn-xs"
+                            type="button" name="mupipExtraGlobalQA" 
+                            title="Help, how to input Global List">
+                      <i class="glyphicon glyphicon-question-sign icon-question"></i>
+                    </button>
+                  </span>
+              </div>
             </div>
-            <div class="form-group">
-              <label for="mupipExtraGlobalList" id="mupipExtraGlobalListHead">
-                Global LIst
-              </label>
-
+            <div class="form-group form-inline">
+              <ul class="list-group list-inline" id="mupipExtraGlobalList"></ul>
             </div>
         </div>
       </div>

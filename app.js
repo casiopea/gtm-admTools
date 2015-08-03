@@ -17,6 +17,7 @@ EWD.application = {
     lkeClearParams: {},
     regionList: {},
     regionSelect2: [],
+    // globals: [],
     gdeRJSNM:{ 'Region': 'gdeRegion', 'Journal': 'gdeJournal',
                'Segment': 'gdeSegment', 'Names': 'gdeNames', 
                'Map': 'gdeMap',
@@ -137,8 +138,6 @@ EWD.application = {
           $.each(messageObj.message.DSEregion, function(key, obj) {
             EWD.application.regionSelect2.push( {id: key, text: obj} );
           });
-          // console.log('EWD.application.regionList = ',EWD.application.regionList);
-          // console.log('EWD.application.regionSelect2 = ',EWD.application.regionSelect2);
         }
       });
     },
@@ -359,22 +358,68 @@ EWD.application = {
           backdrop: 'static'
       });
     },
+    setGlobalsList: function(str){
+      var slist = [];
+      if(str) slist = str.split(',');
+      EWD.sockets.sendMessage({
+        type : 'getGlobals', params: {},
+        done: function(messageObj) {
+          var glb = messageObj.message;
+          var html = '', sli = '', sgl = '';
+          $('#mupipExtraGlobalList').empty();
+          for( var i=0; i<glb.length; i++ ){
+            sli = '<li class="list-group-item" id="mupipExtGL-' +
+                       glb[i] + '">' + glb[i] + '</li>';
+            if(slist.length > 0 ){
+              for( var k=0; k<slist.length ; k++ ){
+                var inStr = slist[k];
+                if (inStr){
+                    if (inStr.slice(-1) == '*') {
+                      var match = inStr.slice(0,inStr.length-1);
+                      if ( glb[i].slice(0,inStr.length-1) == match ){
+                        html += sli;
+                      }
+                    } else {
+                      if (glb[i] == inStr){
+                        html += sli;
+                      }
+                    }
+                }
+              }
+            } else {
+              html += sli ;
+            }
+          }
+          $('#mupipExtraGlobalList').html(html);
+        }
+      });
+    },
     mupipExtractInit: function(event){
       $('#mupipExtraRegionSelect').select2({ data: EWD.application.regionSelect2 });
       $('#mupipExtraRegionSelect').select2("enable", false);
+      EWD.application.setGlobalsList('');
+      EWD.sockets.sendMessage({
+        type : 'getHomeDir', params: {},
+        done: function(messageObj) {
+          $('#mupipExtraFileName').val(messageObj.message + '/1234.glo');
+        }
+      });
     },
     mupipExtraOpeChange: function(value) {
       if( value == 'Reg'){
         $('#mupipExtraGlobalSelector').hide();
         $('#mupipExtraRegionSelect').select2("enable", true);
+        document.getElementById('mupipExtraRegionSelect').focus();
       }
       if( value == 'Glb'){
         $('#mupipExtraGlobalSelector').show();
         $('#mupipExtraRegionSelect').select2("enable", false);
+        document.getElementById('mupipExtraGlobalInput').focus();
       }
       if( value == 'All'){
         $('#mupipExtraGlobalSelector').hide();
         $('#mupipExtraRegionSelect').select2("enable", false);
+        document.getElementById('mupipExtraFileName').focus();
       }
     },
     onStartup: function() {
@@ -401,9 +446,17 @@ EWD.application = {
             .on('click','#sysUtilsFreeCntReloadBtn',EWD.application.sysUtilsFreeCount)
             .on('click','input[name="mupipExtraOpe"]', function(){
                 EWD.application.mupipExtraOpeChange($(this).val());
-            })
+                })
+            .on('click','#mupipExtraGlobalSubmit', function(){
+                document.getElementById('mupipExtraGlobalInput').focus();
+                EWD.application.setGlobalsList($('#mupipExtraGlobalInput').val());
+                })
+            .on('click','#mupipExtraGlobalReloadBtn', function(){
+                $('#mupipExtraGlobalInput').val('');
+                document.getElementById('mupipExtraGlobalInput').focus();
+                EWD.application.setGlobalsList('');
+                })
         ;
-
     },
     onPageSwap: {
     },

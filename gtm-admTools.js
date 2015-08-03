@@ -248,6 +248,15 @@ module.exports = {
             authenticated: true
         };
     },
+    getHomeDir: function(params, ewd){
+      if (!ewd.session.isAuthenticated) return;
+      return process.env.HOME;
+    },
+    getGlobals: function(params, ewd) {
+      if (!ewd.session.isAuthenticated) return;
+      var gloArray = ewd.mumps.getGlobalDirectory();
+      return gloArray;
+    },
     // Lock Utility lke show all
     lkeShowAll: function(params,ewd) {
       if (!ewd.session.isAuthenticated) return;
