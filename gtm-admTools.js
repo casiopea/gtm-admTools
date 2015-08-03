@@ -252,6 +252,12 @@ module.exports = {
       if (!ewd.session.isAuthenticated) return;
       return process.env.HOME;
     },
+    GSELlist: function(params, ewd){
+      if (!ewd.session.isAuthenticated) return;
+      ewd.query = params;
+      var invoke = ewd.util.invokeWrapperFunction('GSELlist^%zjdsGTMadm01', ewd);
+      return invoke.results.GSEL ;
+    },
     getGlobals: function(params, ewd) {
       if (!ewd.session.isAuthenticated) return;
       var gloArray = ewd.mumps.getGlobalDirectory();

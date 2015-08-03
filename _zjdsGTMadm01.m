@@ -1,9 +1,9 @@
 %zjdsGTMadm01	;
 	; --------------------------------------------------------------------
-	; GT.M Administration Utility #01 for EWD.js 2015/07/23 13:12
+	; GT.M Administration Utility #01 for EWD.js 2015/08/23 13:12
 	; #1: GDshowAll    : Global Directory Qualifier show All
 	; #2: FreeBlock    : %FREECNT utility displays the number of free blocks
-	; #3: DSEWRAP      : DSE dump, database file header
+	; #3: DSEWRAP2     : DSE dump, database file header for Bootstrap-Table
 	; #4: DSEregion    : Region List
 	;
 	; Written by Kiyoshi Sawada <casiopea.tpine@gmail.com>
@@ -192,7 +192,7 @@ DSEWRAP(pid)	;
 	; Note : not $ETRAP handler
 	;--------------------------------------------------------------------
 DSEWRAP2(pid)	;
-	; DSE dump, database file header to ewd.js Array object
+	; DSE dump, database file header to ewd.js Array object for Bootstrap-Table
 	; from ewd.js : ewd.util.invokeWrapperFunction('DSEWRAP^%zjdsGTMadm01', ewd);
 	; output JSON ex.
 	;  [{"DEFAULT":0,"FIELD_NAME":"Abandoned Kills","TEMP":0}, .... ]
@@ -257,6 +257,32 @@ DSEregion(pid)	;
 	s GV="" f i=0:1 s GV=$VIEW("GVNEXT",GV) q:GV=""  s GV(i)=GV
 	kill ^%zewdTemp(pid,"outputs","DSEregion")
 	merge ^%zewdTemp(pid,"outputs","DSEregion")=GV
+	QUIT error
+	;--------------------------------------------------------------------
+GSELlist(pid) ;
+	; IN  : mupip Extract SELECT qualifier list
+	; OUT : Global List
+	; inner Module : %ZG -> Do CALL^%GSEL 
+	; zlink "_zjdsGTMadm01.m" do relink^%zewdGTM
+	n inputs,error,n,k,gName,glb,outputs,i
+	merge inputs=^%zewdTemp(pid,"inputs","GSEL")
+	s error=""
+	;
+	s n="",gName=""
+	f  s n=$o(inputs(n)) q:n=""  d
+	. s gName=$g(inputs(n))
+	. i gName?.N quit
+	. i gName[":",$p(gName,":",2)?.N quit
+	. k %ZG
+	. s %ZG=gName
+	. d CALL^%GSEL
+	. i %ZG d
+	. . s k="" f  s k=$o(%ZG(k)) q:k=""  s glb(k)=""
+	. k %ZG
+	s k="" f i=0:1 s k=$o(glb(k)) q:k=""  s outputs(i)=k
+	;
+	kill ^%zewdTemp(pid,"outputs","GSEL")
+	merge ^%zewdTemp(pid,"outputs","GSEL")=outputs
 	QUIT error
 	;--------------------------------------------------------------------
 Test6	;

@@ -359,38 +359,63 @@ EWD.application = {
       });
     },
     setGlobalsList: function(str){
-      var slist = [];
-      if(str) slist = str.split(',');
-      EWD.sockets.sendMessage({
-        type : 'getGlobals', params: {},
-        done: function(messageObj) {
-          var glb = messageObj.message;
-          var html = '', sli = '', sgl = '';
-          $('#mupipExtraGlobalList').empty();
-          for( var i=0; i<glb.length; i++ ){
-            sli = '<li class="list-group-item" id="mupipExtGL-' +
-                       glb[i] + '">' + glb[i] + '</li>';
-            if(slist.length > 0 ){
-              for( var k=0; k<slist.length ; k++ ){
-                var inStr = slist[k];
-                if (inStr){
-                    if (inStr.slice(-1) == '*') {
-                      var match = inStr.slice(0,inStr.length-1);
-                      if ( glb[i].slice(0,inStr.length-1) == match ){
-                        html += sli;
-                      }
-                    } else {
-                      if (glb[i] == inStr){
-                        html += sli;
-                      }
+      var sendStr = [];
+      if( str ){
+        if(str.indexOf(',')>0) {
+          var slist = str.split(',');
+          for ( var i=0; i < slist.length ; i++ ){
+            if (slist[i]) {
+                if(slist[i].indexOf(':')>0){
+                  var rngStr = slist[i].replace('*','').split(':');
+                  rngStr[0] = rngStr[0].trim();
+                  rngStr[1] = rngStr[1].trim();
+                  if (!rngStr[1]) {
+                    if (rngStr[0].match(/^\D/)) sendStr.push(rngStr[0].trim());
+                  } else {
+                    if (rngStr[0].match(/^\D/) && rngStr[1].match(/^\D/)) {
+                      sendStr.push( rngStr[0] + ':' + rngStr[1] );
                     }
+                  }
+                } else {
+                  slist[i] = slist[i].trim();
+                  if (slist[i].match(/^\D/)) sendStr.push(slist[i]);
                 }
-              }
-            } else {
-              html += sli ;
             }
           }
-          $('#mupipExtraGlobalList').html(html);
+        } else {
+          if(str.indexOf(':')>0){
+            var rngStr = str.split(':');
+            rngStr[0] = rngStr[0].trim();
+            rngStr[1] = rngStr[1].trim();
+            if (!rngStr[1]) {
+              if (rngStr[0].match(/^\D/)) sendStr.push(rngStr[0].trim());
+            } else {
+              if (rngStr[0].match(/^\D/) && rngStr[1].match(/^\D/)){
+                sendStr.push( rngStr[0].trim() + ':' + rngStr[1].trim() );
+              }
+            }
+          } else {
+            if (str.match(/^\D/)) sendStr.push(str.trim());
+          }
+        }
+      }
+      str = sendStr ? sendStr.join(',') : '';
+      $('#mupipExtraGlobalInput').val(str);
+      if (!str) sendStr = ['*'];
+      EWD.sockets.sendMessage({     // to call %ZG,  Do CALL^%GSEL
+        type : 'GSELlist', 
+        params: { GSEL : sendStr },
+        done: function(messageObj) {
+          if (messageObj.message) {
+            var glb = messageObj.message;
+            var html = '';
+            $('#mupipExtraGlobalList').empty();
+            for( var i=0; i<glb.length; i++ ){
+              html += '<li class="list-group-item" id="mupipExtGL-' +
+                         glb[i] + '">' + glb[i] + '</li>';
+            }
+            $('#mupipExtraGlobalList').html(html);
+          }
         }
       });
     },
