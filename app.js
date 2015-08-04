@@ -79,6 +79,7 @@ EWD.application = {
         }
       });
       EWD.getFragment('html/mupip/mupip_Extract.html', 'mupipExtract_Container'); 
+      EWD.getFragment('html/mupip/mupip_Load.html', 'mupipLoad_Container'); 
       EWD.getFragment('html/mupip/mupip_Extract_GSELhelp.html', 'mupipExtractGSELhelpModal'); 
       EWD.getFragment('html/lke/lke.html', 'lke_Container'); 
       EWD.getFragment('html/lke/lkeClearConfirm.html', 'lkeClearConfirmModal'); 
