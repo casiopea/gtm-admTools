@@ -109,7 +109,7 @@ EWD.application = {
       }
       return value;
     },
-    gdeShowAall: function(event){
+    gdeShowAall: function(){
       var cntHeight = $("#fin_Container").height() - 200;
       // console.log('ContentHeight = ', cntHeight);
       EWD.sockets.sendMessage({
@@ -128,7 +128,7 @@ EWD.application = {
         }
       });
     },
-    sysUtilsRegionList: function(event){
+    sysUtilsRegionList: function(){
       EWD.sockets.sendMessage({
         type : 'sysUtilsRegionList',
         params: {},
@@ -140,7 +140,7 @@ EWD.application = {
         }
       });
     },
-    sysUtilsFreeCount:function(event){
+    sysUtilsFreeCount:function(){
       EWD.sockets.sendMessage({
         type : 'sysUtilsFreeCount',
         params: {},
@@ -160,7 +160,7 @@ EWD.application = {
         }
       });
     },
-    sysUtilsAbout: function(event){
+    sysUtilsAbout: function(){
       EWD.sockets.sendMessage({
         type : 'sysUtilsAbout',
         params: {},
@@ -176,7 +176,7 @@ EWD.application = {
         }
       });
     },
-    sysUtilsGtmEnv: function(event){
+    sysUtilsGtmEnv: function(){
       EWD.sockets.sendMessage({
         type : 'sysUtilsGtmEnv',
         params: {},
@@ -246,7 +246,7 @@ EWD.application = {
       }
       return value;
     },
-    dseDumpAll: function(event){
+    dseDumpAll: function(){
       var cntHeight = $("#dse_Container").height() - 150;
       $('#sysUtilsDseWarp-table').attr('data-height', cntHeight);
       EWD.sockets.sendMessage({
@@ -278,7 +278,7 @@ EWD.application = {
         }
       });
     },
-    lkeShowAll: function(event){
+    lkeShowAll: function(){
       var cntHeight = $("#fin_Container").height() - 370;
       $('#lkeShowAll-table').attr('data-height', cntHeight);
       EWD.sockets.sendMessage({
@@ -317,7 +317,7 @@ EWD.application = {
         }
       });
     },
-    lkeClearExe: function(event){
+    lkeClearExe: function(){
       $('#lkeClearConfirmModal').modal('hide');
       if(EWD.application.lkeClearParams){
         EWD.sockets.sendMessage({
@@ -447,6 +447,27 @@ EWD.application = {
         document.getElementById('mupipExtraFileName').focus();
       }
     },
+    mupipLoadCheckChange: function(value, checked) {
+      if(value == 'recnum') {
+        if(checked){
+          $('.mupipLoadBgnEnd').removeAttr("disabled");
+        } else {
+          $('.mupipLoadBgnEnd').attr('disabled', 'disabled');
+        }
+      }
+      if(value == 'fillfacter') {
+        if(checked){
+          $('#mupipLoadFillFactor').removeAttr("disabled");
+        } else {
+          $('#mupipLoadFillFactor').attr('disabled', 'disabled');
+        }
+      }
+    },
+    mupipLoadInit: function(){
+      var cntHeight = $("#fin_Container").height() - 350;
+      $('#mupipLoadLoadedHeader').height(cntHeight);
+      $('#mupipLoadedGlobalList').height(cntHeight - 100);
+    },
     onStartup: function() {
         toastr.options.target = 'body';
         EWD.application.initFragment();
@@ -465,29 +486,48 @@ EWD.application = {
             .on('click','#btnLogout',EWD.application.openLogOutModal)
             .on('click','#logoutConfirmPanelOKBtn',EWD.application.logOut)
             .on('click','#deleteConfirmPanelOKBtn',EWD.application.sessionDeleted)
-            .on('click','#dseDumpReloadBtn',EWD.application.dseDumpAll)
-            .on('click','#lkeShowReloadBtn',EWD.application.lkeShowAll)
-            .on('click','#lkeClearConfirmOKBtn',EWD.application.lkeClearExe)
-            .on('click','#sysUtilsFreeCntReloadBtn',EWD.application.sysUtilsFreeCount)
-            .on('click','input[name="mupipExtraOpe"]', function(){
-                EWD.application.mupipExtraOpeChange($(this).val());
+            .on('click','#dseDumpReloadBtn', function(event) {
+                  event.preventDefault();
+                  EWD.application.dseDumpAll();
                 })
-            .on('click','#mupipExtraGlobalSubmit', function(){
-                document.getElementById('mupipExtraGlobalInput').focus();
-                EWD.application.setGlobalsList($('#mupipExtraGlobalInput').val());
+            .on('click','#lkeShowReloadBtn', function(event) {
+                  event.preventDefault();
+                  EWD.application.lkeShowAll();
                 })
-            .on('click','#mupipExtraGlobalReloadBtn', function(){
-                $('#mupipExtraGlobalInput').val('');
-                document.getElementById('mupipExtraGlobalInput').focus();
-                EWD.application.setGlobalsList('');
+            .on('click','#lkeClearConfirmOKBtn', function(event) {
+                  event.preventDefault();
+                  EWD.application.lkeClearExe();
                 })
-            .on('click','#mupipExtraGlobalQABtn', function(){
-                $('#mupipExtractGSELhelpModal').modal({
-                    keyboard: true,  backdrop: 'static'
-                });
+            .on('click','#sysUtilsFreeCntReloadBtn', function(event) {
+                  event.preventDefault();
+                  EWD.application.sysUtilsFreeCount();
                 })
-            .on('click','#mupipExtraStartBtn', function () {
-                $('#mupipExtraStartBtn').button('extracting');
+            .on('click','input[name="mupipExtraOpe"]', function(event){
+                  EWD.application.mupipExtraOpeChange($(this).val());
+                })
+            .on('click','#mupipExtraGlobalSubmit', function(event){
+                  event.preventDefault();
+                  document.getElementById('mupipExtraGlobalInput').focus();
+                  EWD.application.setGlobalsList($('#mupipExtraGlobalInput').val());
+                })
+            .on('click','#mupipExtraGlobalReloadBtn', function(event){
+                  event.preventDefault();
+                  $('#mupipExtraGlobalInput').val('');
+                  document.getElementById('mupipExtraGlobalInput').focus();
+                  EWD.application.setGlobalsList('');
+                })
+            .on('click','#mupipExtraGlobalQABtn', function(event){
+                  event.preventDefault();
+                  $('#mupipExtractGSELhelpModal').modal({
+                      keyboard: true,  backdrop: 'static'
+                  });
+                })
+            .on('click','#mupipExtraStartBtn', function (event) {
+                  event.preventDefault();
+                  $('#mupipExtraStartBtn').button('extracting');
+                })
+            .on('click','#mupipLoadPageLoaded input[type="checkbox"]', function(event){
+                  EWD.application.mupipLoadCheckChange($(this).val(), $(this).prop('checked'));
                 })
         ;
     },
@@ -501,20 +541,21 @@ EWD.application = {
           toastr.error(messageObj.message.error);
         }else{
           if(messageObj.message.authenticated){
-            $('#loginModal').modal('hide');
             EWD.application.username = messageObj.message.username;
-            $('#gde_Container').show();
             // var mess = locale.tooltip.btnLogout ? locale.tooltip.btnLogout : ' user Logout (Ctrl+Q)';
             var mess = ' user Logout';
             $('#btnLogout').attr('title',EWD.application.username + mess);
             EWD.application.sysUtilsRegionList();
             EWD.application.gdeShowAall();
-            EWD.application.sysUtilsFreeCount();
             EWD.application.sysUtilsAbout();
             EWD.application.sysUtilsGtmEnv();
+            EWD.application.mupipExtractInit();
+            EWD.application.mupipLoadInit();
+            EWD.application.sysUtilsFreeCount();
             EWD.application.dseDumpAll();
             EWD.application.lkeShowAll();
-            EWD.application.mupipExtractInit();
+            $('#gde_Container').show();
+            $('#loginModal').modal('hide');
           }else{
             // var mess = locale.alert.Login ? locale.alert.Login : 'error!';
             var mess = 'error!';
