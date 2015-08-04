@@ -1,0 +1,31 @@
+
+body {
+  padding-top: 60px;
+  padding-bottom: 40px;
+}
+#content {
+  height: 100%;
+}
+.container.collapse {
+  height: 100%;
+}
+.sidebar-nav {
+  padding: 9px 0;
+}
+#lkeShowAll-table tbody {
+  cursor: pointer
+}
+.list-inline {
+  overflow-y: scroll;
+}
+.well-mupip {
+  margin-bottom: 10px;
+}
+.pull-right {
+  margin-right: 20px;
+}
+.list-group-item {
+  padding: 4px 8px;
+}
+
+

@@ -1,0 +1,39 @@
+
+  <!-- mupipExtractGSELhelp Modal Panel content-->
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <a class="close" data-dismiss="modal">&times;</a>
+        <h4 class="modal-title" 
+            id="mupipExtractGSELhelpPanelHeading">
+            Specifies globals / MUPIP EXTRACT</h4>
+      </div>
+      <div class="modal-body" id="mupipExtractGSELhelpPanelBody">
+
+          <p>The global-specification can be:</p>
+          <div class="itemizedlist">
+            <ul class="itemizedlist" type="disc">
+              <li class="listitem">
+                <p>A parenthetical list, such as (a,B,C). In this case, MUPIP EXTRACT selects all globals except ^a, ^B, and ^C.</p>
+              </li>
+              <li class="listitem">
+                <p>A global name, such as MEF. In this case, MUPIP EXTRACT selects only global ^MEF.</p>
+              </li>
+              <li class="listitem">
+                <p>A range of global names, such as A7:B6. In this case, MUPIP EXTRACT selects all global names between ^A7 and ^B6, inclusive.</p>
+              </li>
+              <li class="listitem">
+                <p>A list, such as A,B,C. In this case, MUPIP EXTRACT selects globals ^A, ^B, and ^C.</p>
+              </li>
+              <li class="listitem">
+                <p>Global names with the same prefix, such as PIGEON*. In this case, EXTRACT selects all global names from ^PIGEON through ^PIGEONzzzzz. </p>
+              </li>
+            </ul>
+          </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" id="mupipExtractGSELhelpCancelBtn" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>

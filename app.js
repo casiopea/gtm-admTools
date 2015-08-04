@@ -78,16 +78,14 @@ EWD.application = {
             });
         }
       });
-      EWD.sockets.sendMessage({
-        type: "EWD.getFragment", 
-        params:  { file: 'html/mupip/mupip_Extract.html',
-                   targetId: 'mupipExtract_Container' }
-      });
+      EWD.getFragment('html/mupip/mupip_Extract.html', 'mupipExtract_Container'); 
+      EWD.getFragment('html/mupip/mupip_Extract_GSELhelp.html', 'mupipExtractGSELhelpModal'); 
       EWD.getFragment('html/lke/lke.html', 'lke_Container'); 
       EWD.getFragment('html/lke/lkeClearConfirm.html', 'lkeClearConfirmModal'); 
       EWD.getFragment('html/dse/dse.html', 'dse_Container'); 
       EWD.getFragment('html/sysUtils/sysUtils_FreeCntTable.html', 'FreeCnt_Container'); 
       EWD.getFragment('html/sysUtils/sysUtils_GtmEnvTable.html', 'GtmEnv_Container'); 
+      EWD.getFragment('html/schedule/schedule.html', 'schedule_Container'); 
       EWD.getFragment('html/fin.html', 'fin_Container'); 
       EWD.getFragment('html/about.html', 'about_Container'); 
       EWD.getFragment('html/login.html', 'loginModal');
@@ -354,11 +352,13 @@ EWD.application = {
       $('#lkeClearConfirmQuestion').html('Do you Lock Clear?<br/>   > ' + question);
       EWD.application.lkeClearParams = { type: row, value: value };
       $('#lkeClearConfirmModal').modal({
-          keyboard: true,
-          backdrop: 'static'
+          keyboard: true,  backdrop: 'static'
       });
     },
     setGlobalsList: function(str){
+      var cntHeight = $("#fin_Container").height() - 350;
+      $('#mupipExtraGlobalSelector').height(cntHeight);
+      $('#mupipExtraGlobalList').height(cntHeight - 100);
       var sendStr = [];
       if( str ){
         if(str.indexOf(',')>0) {
@@ -406,13 +406,12 @@ EWD.application = {
         type : 'GSELlist', 
         params: { GSEL : sendStr },
         done: function(messageObj) {
-          if (messageObj.message) {
-            var glb = messageObj.message;
+          $('#mupipExtraGlobalList').html('');
+          if (messageObj.message.GSEL) {
+            var glb = messageObj.message.GSEL;
             var html = '';
-            $('#mupipExtraGlobalList').empty();
             for( var i=0; i<glb.length; i++ ){
-              html += '<li class="list-group-item" id="mupipExtGL-' +
-                         glb[i] + '">' + glb[i] + '</li>';
+              html += '<li class="list-group-item">' + glb[i] + '</li>';
             }
             $('#mupipExtraGlobalList').html(html);
           }
@@ -432,17 +431,17 @@ EWD.application = {
     },
     mupipExtraOpeChange: function(value) {
       if( value == 'Reg'){
-        $('#mupipExtraGlobalSelector').hide();
+        $('#mupipExtraGlobalSelector .form-gsel').hide();
         $('#mupipExtraRegionSelect').select2("enable", true);
         document.getElementById('mupipExtraRegionSelect').focus();
       }
       if( value == 'Glb'){
-        $('#mupipExtraGlobalSelector').show();
+        $('#mupipExtraGlobalSelector .form-gsel').show();
         $('#mupipExtraRegionSelect').select2("enable", false);
         document.getElementById('mupipExtraGlobalInput').focus();
       }
       if( value == 'All'){
-        $('#mupipExtraGlobalSelector').hide();
+        $('#mupipExtraGlobalSelector .form-gsel').hide();
         $('#mupipExtraRegionSelect').select2("enable", false);
         document.getElementById('mupipExtraFileName').focus();
       }
@@ -480,6 +479,14 @@ EWD.application = {
                 $('#mupipExtraGlobalInput').val('');
                 document.getElementById('mupipExtraGlobalInput').focus();
                 EWD.application.setGlobalsList('');
+                })
+            .on('click','#mupipExtraGlobalQABtn', function(){
+                $('#mupipExtractGSELhelpModal').modal({
+                    keyboard: true,  backdrop: 'static'
+                });
+                })
+            .on('click','#mupipExtraStartBtn', function () {
+                $('#mupipExtraStartBtn').button('extracting');
                 })
         ;
     },

@@ -16,6 +16,7 @@
     <link href="css/select2.css" rel="stylesheet" />
     <link href="css/toastr.css" rel="stylesheet" />
     <link href="css/bootstrap-table.min.css" rel="stylesheet" />
+    <link href="css/app.css" rel="stylesheet" />
     <link rel="shortcut icon" href="./favicon.png" />
     <script src="/socket.io/socket.io.js"></script>
     <title id="ewd-title"></title>
@@ -25,18 +26,6 @@
     <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-    <style type="text/css">
-      body {
-        padding-top: 60px;
-        padding-bottom: 40px;
-      }
-      .sidebar-nav {
-        padding: 9px 0;
-      }
-      #lkeShowAll-table tbody {
-        cursor: pointer
-      }
-    </style>
 </head>
 <body>
     <!-- NavBar header -->
@@ -70,6 +59,9 @@
             <li id="dse_Nav" data-header="dse">
               <a href="#" data-toggle="tooltip" title="Database Structure Editor" id="dseNavHref">DSE</a>
             </li>
+            <li id="schedule_Nav" data-header="schedule">
+              <a href="#" data-toggle="tooltip" title="GT.M Scheduler setting" id="scheduleNavHref">Schedule</a>
+            </li>
             <li id="SysUtils_Parent" class="dropdown">   <!-- Sys Utils Menu -->
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" id="mnuSysUtilsHref" data-toggle="tooltip" title="System Utilities">Sys Utils <span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu" id="mnuSysUtils">
@@ -94,15 +86,16 @@
       </div>
     </nav>
     <!-- Main body -->
-    <div id="content" style="height: 100%;">
+    <div id="content">
       <div id="gde_Container" class="container in" style="display: none"></div>
-      <div id="mupipExtract_Container" class="container collapse" style="height: 100%;"></div>
-      <div id="lke_Container" class="container collapse" style="height: 100%;"></div>
-      <div id="FreeCnt_Container" class="container collapse" style="height: 100%;"></div>
-      <div id="GtmEnv_Container" class="container collapse" style="height: 100%;"></div>
-      <div id="dse_Container" class="container collapse" style="height: 100%;"></div>
-      <div id="about_Container" class="container collapse" style="height: 100%;"></div>
-      <div id="fin_Container" class="container collapse" style="height: 100%;"></div>
+      <div id="mupipExtract_Container" class="container collapse"></div>
+      <div id="lke_Container" class="container collapse"></div>
+      <div id="FreeCnt_Container" class="container collapse"></div>
+      <div id="GtmEnv_Container" class="container collapse"></div>
+      <div id="dse_Container" class="container collapse"></div>
+      <div id="schedule_Container" class="container collapse"></div>
+      <div id="about_Container" class="container collapse"></div>
+      <div id="fin_Container" class="container collapse"></div>
     </div>
     <!-- NavBar footer -->
     <nav class="navbar navbar-default navbar-fixed-bottom">
@@ -112,6 +105,10 @@
         </div>
       </div>
     </nav>
+
+    <!-- mupip Extract GSEL Help Modal -->
+    <div id="mupipExtractGSELhelpModal" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mupipExtractGSELhelpModalLabel" aria-hidden="true">
+    </div>
     <!-- LKE tbody click fire Modal -->
     <div id="lkeClearConfirmModal" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="lkeClearConfirmModalLabel" aria-hidden="true">
     </div>
