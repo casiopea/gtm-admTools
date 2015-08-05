@@ -80,13 +80,19 @@ EWD.application = {
       });
       EWD.getFragment('html/mupip/mupip_Extract.html', 'mupipExtract_Container'); 
       EWD.getFragment('html/mupip/mupip_Load.html', 'mupipLoad_Container'); 
+      EWD.getFragment('html/mupip/mupip_Integ.html', 'mupipInteg_Container'); 
       EWD.getFragment('html/mupip/mupip_Extract_GSELhelp.html', 'mupipExtractGSELhelpModal'); 
+
       EWD.getFragment('html/lke/lke.html', 'lke_Container'); 
       EWD.getFragment('html/lke/lkeClearConfirm.html', 'lkeClearConfirmModal'); 
+
       EWD.getFragment('html/dse/dse.html', 'dse_Container'); 
+
       EWD.getFragment('html/sysUtils/sysUtils_FreeCntTable.html', 'FreeCnt_Container'); 
       EWD.getFragment('html/sysUtils/sysUtils_GtmEnvTable.html', 'GtmEnv_Container'); 
+
       EWD.getFragment('html/schedule/schedule.html', 'schedule_Container'); 
+
       EWD.getFragment('html/fin.html', 'fin_Container'); 
       EWD.getFragment('html/about.html', 'about_Container'); 
       EWD.getFragment('html/login.html', 'loginModal');
@@ -111,7 +117,6 @@ EWD.application = {
     },
     gdeShowAall: function(){
       var cntHeight = $("#fin_Container").height() - 200;
-      // console.log('ContentHeight = ', cntHeight);
       EWD.sockets.sendMessage({
         type : 'GDshowAll',
         params: {},
@@ -419,7 +424,7 @@ EWD.application = {
         }
       });
     },
-    mupipExtractInit: function(event){
+    mupipExtractInit: function(){
       $('#mupipExtraRegionSelect').select2({ data: EWD.application.regionSelect2 });
       $('#mupipExtraRegionSelect').select2("enable", false);
       EWD.application.setGlobalsList('');
@@ -467,6 +472,21 @@ EWD.application = {
       var cntHeight = $("#fin_Container").height() - 350;
       $('#mupipLoadLoadedHeader').height(cntHeight);
       $('#mupipLoadedGlobalList').height(cntHeight - 100);
+    },
+    mupipIntegInit: function () {
+      $('#mupipIntegRegionSelect').select2({ data: EWD.application.regionSelect2 });
+      document.getElementById('mupipIntegTargetFileName').focus();
+    },
+    mupipIntegCheckChange: function(value) {
+      if (value == 'file') {
+        $('#mupipIntegRegionSelectForm').hide();
+        $('#mupipIntegTargetFileNameForm').show();
+        document.getElementById('mupipIntegTargetFileName').focus();
+      }
+      if (value == 'region') {
+        $('#mupipIntegRegionSelectForm').show();
+        $('#mupipIntegTargetFileNameForm').hide();
+      }
     },
     onStartup: function() {
         toastr.options.target = 'body';
@@ -529,6 +549,9 @@ EWD.application = {
             .on('click','#mupipLoadPageLoaded input[type="checkbox"]', function(event){
                   EWD.application.mupipLoadCheckChange($(this).val(), $(this).prop('checked'));
                 })
+            .on('click','input[name="mupipIntegTarget"]', function(event){
+                  EWD.application.mupipIntegCheckChange($(this).val());
+                })
         ;
     },
     onPageSwap: {
@@ -551,6 +574,7 @@ EWD.application = {
             EWD.application.sysUtilsGtmEnv();
             EWD.application.mupipExtractInit();
             EWD.application.mupipLoadInit();
+            EWD.application.mupipIntegInit();
             EWD.application.sysUtilsFreeCount();
             EWD.application.dseDumpAll();
             EWD.application.lkeShowAll();
