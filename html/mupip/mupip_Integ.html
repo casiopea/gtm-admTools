@@ -37,7 +37,7 @@
         </div>
         <div class="well well-sm well-mupip well-Report">
             <div class="form-inline">
-              <label id="mupipIntegFmtHead">Summary Report</label>
+              <label id="mupipIntegFmtHead">Integ Summary Report</label>
             </div>
             <div class="radio-inline">
               <label>
@@ -58,6 +58,7 @@
               </label>
             </div>
         </div>
+        <!-- 
         <div class="well well-sm well-mupip well-Keyranges">
           <div class="checkbox-inline">
             <label>
@@ -66,35 +67,54 @@
             </label>
           </div>
         </div>
-        <div class="well well-sm well-mupip well-Start">
-          <div class="row">
-            <button type="button" id="mupipIntegStartBtn" 
-                    data-Integcting-text="Now doing Integrity ...." 
-                    class="btn btn-primary pull-right" 
-                    autocomplete="off">Start
-            </button>
-          </div>
+         -->
+        <div class="well well-sm well-mupip well-Control">
+              <div class="btn-group" role="group">
+                <button type="button" id="mupipIntegResetBtn" 
+                        class="btn btn-primary" 
+                        autocomplete="off">Reset
+                </button>
+              </div>
+              <div class="btn-group" role="group">
+                <button type="button" id="mupipIntegStopBtn" 
+                        class="btn btn-primary"  disabled="disabled"
+                        autocomplete="off">Stop Integ
+                </button>
+              </div>
+              <div class="btn-group" role="group">
+                <button type="button" id="mupipIntegStartBtn" 
+                        data-Integcting-text="Now doing Integrity ...." 
+                        class="btn btn-primary" 
+                        autocomplete="off">Integ Start
+                </button>
+              </div>
         </div>
+
       </div>
       <div class="col-xs-8">
+
         <div id="mupipIntegGlobalSelector" style="display: block;">
+            <label for="mupipIntegResultFor" id="mupipIntegResult">
+              mupip Integ Result
+            </label>
             <div class="form-group form-inline form-gsel">
               <ul class="list-group list-inline" id="mupipIntegGlobalList"></ul>
             </div>
         </div>
         <div id="mupipIntegLog">
-            <label for="mupipIntegLogConsolFor" id="mupipIntegGlobalLogConsol">
-              mupip Integct Consol
+            <label for="mupipIntegLogConsolFor" id="mupipIntegGlobalLogConsole">
+              mupip Integ Console
             </label>
             <pre class="pre pre-out" id="mupipIntegLogPreArea" 
                  name="mupipIntegLogPre" 
-                 style="height: 150px; overflow: scroll; ">
+                 style="height: 250px; overflow: scroll; ">
 
 
 
 
             </pre>
         </div>
+
       </div>
     </div>
   </div>

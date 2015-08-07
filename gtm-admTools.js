@@ -34,6 +34,7 @@ var i18n = {
 };
 var fs = require('fs');
 var path = require('path');
+var fork = require('child_process').fork;
 var exec = require('child_process').exec;
 var spawn = require('child_process').spawn;
 var crypto = require("crypto");
@@ -61,6 +62,32 @@ var password = {
     if (credentials.hash === encrypted) return true;
     return false;
   }
+};
+var htmlFileList = [];
+var htmlDirWalk = function(p, callback){
+  var results = [];
+  fs.readdir(p, function (err, files) {
+    if (err) throw err;
+ 
+    var pending = files.length; 
+    if (!pending) return callback(null, results); 
+    
+    files.map(function (file) { 
+      return path.join(p, file);
+    }).filter(function (file) {
+      if(fs.statSync(file).isDirectory()) htmlDirWalk(file, function(err, res) { 
+        results.push({name:path.basename(file), children:res});
+        if (!--pending) callback(null, results);
+       });
+      return fs.statSync(file).isFile();
+    }).forEach(function (file) {   // save file name
+      var stat = fs.statSync(file);
+      results.push({file:path.basename(file), size:stat.size});
+      htmlFileList.push(file); 
+      if (!--pending) callback(null, results);
+    });
+    
+  });
 };
 var initLoginType = function(loginType, ewd){
     if (loginType == 'ewdMonitor') {
@@ -191,10 +218,127 @@ var lkeClearExe = function(params, ewd) {
             }
         });
 };
+var mupipIntegSpawn = function(params, ewd) {
+  var report = '-' + params.report;
+  var target = '-' + params.target + ' ' + params.targetVal;
+  var command = 'mupip integ ' + report + ' ' + target;
+  console.log('****** MUPIP INTEG = ' + command);
+
+  var integ = spawn( 'mupip',  [ 'integ', report, target ] );
+
+  integ.stderr.on('data', function (data) {
+    // console.log('****** MUPIP INTEG stderr = ' + command + ' : stderr = ', data.toString());
+    ewd.sendWebSocketMsg({
+        type: 'mupipIntegSpawnMessage',
+        message: { type: 'data', retrieve: data.toString() }
+    });
+  });
+  integ.on('exit', function (code) {
+    // console.log('****** MUPIP INTEG Exit = ' + command + ' : child process exited with code ' + code);
+    ewd.sendWebSocketMsg({
+      type: 'mupipIntegSpawnMessage',
+      message: { type: 'exit', retrieve: code }
+    });
+  });
+  integ.on('error', function(err) {
+    // console.log('****** MUPIP INTEG error = ' + command + ' : err = ', err);
+    ewd.sendWebSocketMsg({
+      type: 'mupipIntegSpawnMessage',
+      message: { type: 'error', retrieve: err } 
+    });
+  });
+};
 
 module.exports = {
 
   onMessage: {
+
+    // MUPIP Integ Spawn :  call to $gtm_dist/mupip integ -.....
+    mupipIntegSpawn: function(params, ewd){
+      if (!ewd.session.isAuthenticated) return;
+      mupipIntegSpawn(params, ewd);
+    },
+    getHomeDir: function(params, ewd){
+      if (!ewd.session.isAuthenticated) return;
+      return process.env.HOME;
+    },
+    GSELlist: function(params, ewd){
+      if (!ewd.session.isAuthenticated) return;
+      ewd.query = params;
+      var invoke = ewd.util.invokeWrapperFunction('GSELlist^%zjdsGTMadm01', ewd);
+      return { result : 'ok', GSEL: invoke.results.GSEL };
+    },
+    getGlobals: function(params, ewd) {
+      if (!ewd.session.isAuthenticated) return;
+      var gloArray = ewd.mumps.getGlobalDirectory();
+      return gloArray;
+    },
+    // Lock Utility lke show all
+    lkeShowAll: function(params,ewd) {
+      if (!ewd.session.isAuthenticated) return;
+      ewd.query = params;
+      var invoke = ewd.util.invokeWrapperFunction('DSEregion^%zjdsGTMadm01', ewd);
+      lkeShowAll(params, ewd, invoke.results.DSEregion);
+    },
+    // Lock Utility lke clear
+    lkeClear: function(params,ewd) {
+      if (!ewd.session.isAuthenticated) return;
+      lkeClearExe(params, ewd);
+    },
+    // process environment
+    sysUtilsGtmEnv: function(params, ewd) {
+      if (!ewd.session.isAuthenticated) return;
+      return process.env;
+    },
+    // about this Sysytem information
+    sysUtilsAbout: function(params, ewd) {
+      if (!ewd.session.isAuthenticated) return;
+      return {
+                nodeVersion: process.version ,
+                build: '100 (15 May 2015)',
+                // build: ewdjsBuild(),
+                gtm: ewd.mumps.version(),
+                platform: os.platform(),
+                release: os.release()
+              };
+    },
+    // %FREECNT: number of free blocks in the database files
+    sysUtilsFreeCount:function(params,ewd){
+      if (!ewd.session.isAuthenticated) return;
+      ewd.query = params;
+      var invoke = ewd.util.invokeWrapperFunction('FreeBlock^%zjdsGTMadm01', ewd);
+      return invoke.results;
+    },
+    // Get Region List 
+    sysUtilsRegionList: function(params, ewd){
+      if (!ewd.session.isAuthenticated) return;
+      ewd.query = params;
+      var invoke = ewd.util.invokeWrapperFunction('DSEregion^%zjdsGTMadm01', ewd);
+      return invoke.results;
+    },
+    // DSE wrap for BootStrap-Table.wenzhixin format  : invoking DSEWRAP2^%zjdsGTMadm01
+    dseWarp: function(params, ewd) {
+      if (!ewd.session.isAuthenticated) return;
+      ewd.query = params;
+      var invoke = ewd.util.invokeWrapperFunction('DSEWRAP2^%zjdsGTMadm01', ewd);
+      return invoke.results;
+    },
+    // GDE Qualifier Data : invoking GDshowAll^%zjdsGTMadm01
+    GDshowAll: function(params, ewd) {
+      if (!ewd.session.isAuthenticated) return;
+      ewd.query = params;
+      var invoke = ewd.util.invokeWrapperFunction('GDshowAll^%zjdsGTMadm01', ewd);
+      return invoke.results;
+    },
+    // gtm-admTools/html  get file-List
+    htmlDirList: function(params, ewd){
+      var dir = params.dir;
+      htmlDirWalk(dir, function(err, results) {
+        if (err) throw err;
+        ewd.sendWebSocketMsg({ type: 'htmlDirList', list: htmlFileList });
+      });
+    },
+    // Login user name and password Check, ewd.session.isAuthenticated = true
     Login: function(params,ewd){
         var loginType = params.loginType;
         if ( !initLoginType(loginType, ewd) ) {      //  loginType must be 'medo' or 'ewdMonitor'
@@ -247,80 +391,7 @@ module.exports = {
             username : params.username,
             authenticated: true
         };
-    },
-    getHomeDir: function(params, ewd){
-      if (!ewd.session.isAuthenticated) return;
-      return process.env.HOME;
-    },
-    GSELlist: function(params, ewd){
-      if (!ewd.session.isAuthenticated) return;
-      ewd.query = params;
-      var invoke = ewd.util.invokeWrapperFunction('GSELlist^%zjdsGTMadm01', ewd);
-      return { result : 'ok', GSEL: invoke.results.GSEL };
-    },
-    getGlobals: function(params, ewd) {
-      if (!ewd.session.isAuthenticated) return;
-      var gloArray = ewd.mumps.getGlobalDirectory();
-      return gloArray;
-    },
-    // Lock Utility lke show all
-    lkeShowAll: function(params,ewd) {
-      if (!ewd.session.isAuthenticated) return;
-      ewd.query = params;
-      var invoke = ewd.util.invokeWrapperFunction('DSEregion^%zjdsGTMadm01', ewd);
-      lkeShowAll(params, ewd, invoke.results.DSEregion);
-    },
-    // Lock Utility lke clear
-    lkeClear: function(params,ewd) {
-      if (!ewd.session.isAuthenticated) return;
-      lkeClearExe(params, ewd);
-    },
-    // process environment
-    sysUtilsGtmEnv: function(params, ewd) {
-      if (!ewd.session.isAuthenticated) return;
-      return process.env;
-    },
-    // about this Sysytem information
-    sysUtilsAbout: function(params, ewd) {
-      if (!ewd.session.isAuthenticated) return;
-      return {
-                nodeVersion: process.version ,
-                // build: '100 (15 May 2015)',
-                build: ewdjsBuild(),
-                gtm: ewd.mumps.version(),
-                platform: os.platform(),
-                release: os.release()
-              };
-    },
-    // %FREECNT: number of free blocks in the database files
-    sysUtilsFreeCount:function(params,ewd){
-      if (!ewd.session.isAuthenticated) return;
-      ewd.query = params;
-      var invoke = ewd.util.invokeWrapperFunction('FreeBlock^%zjdsGTMadm01', ewd);
-      return invoke.results;
-    },
-    // Get Region List 
-    sysUtilsRegionList: function(params, ewd){
-      if (!ewd.session.isAuthenticated) return;
-      ewd.query = params;
-      var invoke = ewd.util.invokeWrapperFunction('DSEregion^%zjdsGTMadm01', ewd);
-      return invoke.results;
-    },
-    // DSE wrap for BootStrap-Table.wenzhixin format  : invoking DSEWRAP2^%zjdsGTMadm01
-    dseWarp: function(params, ewd) {
-      if (!ewd.session.isAuthenticated) return;
-      ewd.query = params;
-      var invoke = ewd.util.invokeWrapperFunction('DSEWRAP2^%zjdsGTMadm01', ewd);
-      return invoke.results;
-    },
-    // GDE Qualifier Data : invoking GDshowAll^%zjdsGTMadm01
-    GDshowAll: function(params, ewd) {
-      if (!ewd.session.isAuthenticated) return;
-      ewd.query = params;
-      var invoke = ewd.util.invokeWrapperFunction('GDshowAll^%zjdsGTMadm01', ewd);
-      return invoke.results;
     }
-
   }
 
 };

@@ -1,9 +1,11 @@
 EWD.sockets.log = true;
 
+
 EWD.application = {
     name: 'gtm-admTools',
     timeout: 3600,
     login: true,
+    locale: 'ja-JP',                //  'en-US',
     labels: {
         'ewd-title': 'GT.M  Admin Tools',
         'ewd-navbar-title-phone': 'GT.M admTools',
@@ -81,7 +83,6 @@ EWD.application = {
       EWD.getFragment('html/mupip/mupip_Extract.html', 'mupipExtract_Container'); 
       EWD.getFragment('html/mupip/mupip_Load.html', 'mupipLoad_Container'); 
       EWD.getFragment('html/mupip/mupip_Integ.html', 'mupipInteg_Container'); 
-      EWD.getFragment('html/mupip/mupip_Extract_GSELhelp.html', 'mupipExtractGSELhelpModal'); 
 
       EWD.getFragment('html/lke/lke.html', 'lke_Container'); 
       EWD.getFragment('html/lke/lkeClearConfirm.html', 'lkeClearConfirmModal'); 
@@ -93,11 +94,13 @@ EWD.application = {
 
       EWD.getFragment('html/schedule/schedule.html', 'schedule_Container'); 
 
-      EWD.getFragment('html/fin.html', 'fin_Container'); 
-      EWD.getFragment('html/about.html', 'about_Container'); 
-      EWD.getFragment('html/login.html', 'loginModal');
-      EWD.getFragment('html/logout.html', 'logoutConfirmPanel');
-      EWD.getFragment('html/balus.html', 'deleteConfirmPanel');
+      EWD.getFragment('html/activity/fin.html', 'fin_Container'); 
+      EWD.getFragment('html/activity/about.html', 'about_Container'); 
+      EWD.getFragment('html/activity/login.html', 'loginModal');
+      EWD.getFragment('html/activity/logout.html', 'logoutConfirmPanel');
+      EWD.getFragment('html/activity/balus.html', 'deleteConfirmPanel');
+
+      EWD.getFragment('html/mupip/mupip_Extract_GSELhelp.html', 'mupipExtractGSELhelpModal'); 
     },
     gdeShowAallFormatter: function(value){
       var field = this.field;
@@ -139,9 +142,14 @@ EWD.application = {
         params: {},
         done: function(messageObj) {
           EWD.application.regionList = messageObj.message.DSEregion;
-          $.each(messageObj.message.DSEregion, function(key, obj) {
-            EWD.application.regionSelect2.push( {id: key, text: obj} );
-          });
+  
+          // $.each(messageObj.message.DSEregion, function(key, obj) {
+          //   EWD.application.regionSelect2.push( {id: key, text: obj} );
+          // });
+          EWD.application.regionSelect2.push( {id: 0, text: 'DEFAULT'} );
+          EWD.application.regionSelect2.push( {id: 1, text: 'MEGA'} );
+          EWD.application.regionSelect2.push( {id: 2, text: 'TEMP'} );
+  
         }
       });
     },
@@ -179,6 +187,9 @@ EWD.application = {
           $('#buildVersion-ewdgateway2').html(m.build);
           $('#buildVersion-Ubuntu').html( m.platform + ' ' + m.release);
         }
+      });
+      EWD.sockets.sendMessage({
+        type: "EWD.startMonitor", message:  "start",
       });
     },
     sysUtilsGtmEnv: function(){
@@ -425,7 +436,8 @@ EWD.application = {
       });
     },
     mupipExtractInit: function(){
-      $('#mupipExtraRegionSelect').select2({ data: EWD.application.regionSelect2 });
+      $('#mupipExtraRegionSelect').select2(
+                        { multiple: true, data: EWD.application.regionSelect2 });
       $('#mupipExtraRegionSelect').select2("enable", false);
       EWD.application.setGlobalsList('');
       EWD.sockets.sendMessage({
@@ -474,10 +486,14 @@ EWD.application = {
       $('#mupipLoadedGlobalList').height(cntHeight - 100);
     },
     mupipIntegInit: function () {
-      $('#mupipIntegRegionSelect').select2({ data: EWD.application.regionSelect2 });
+      var cntHeight = $("#fin_Container").height() - 400;
+      $('#mupipIntegGlobalList').height(cntHeight - 100);
+
+      $('#mupipIntegRegionSelect').select2(
+                    { multiple: true, data: EWD.application.regionSelect2 });
       document.getElementById('mupipIntegTargetFileName').focus();
     },
-    mupipIntegCheckChange: function(value) {
+    mupipIntegControl: function(value) {
       if (value == 'file') {
         $('#mupipIntegRegionSelectForm').hide();
         $('#mupipIntegTargetFileNameForm').show();
@@ -487,9 +503,72 @@ EWD.application = {
         $('#mupipIntegRegionSelectForm').show();
         $('#mupipIntegTargetFileNameForm').hide();
       }
+      if (value == 'reset') {
+        $('input[name="mupipIntegReport"]').val(['brief']);
+        $("#mupipIntegTargetFileName").val('');
+        $('#mupipIntegRegionSelect').select2('val',[]);
+        $('#mupipIntegLogPreArea').text('');
+        $("#mupipIntegTarget-file").click();
+      }
+      if (value == 'stop') {
+        $('#mupipIntegStopBtn').attr('disabled', 'disabled');
+        $('#mupipIntegResetBtn').removeAttr("disabled");
+        $('#mupipIntegStartBtn').removeAttr("disabled");
+      }
+      if (value == 'start') {
+        $('#mupipIntegLogPreArea').text('');
+        $('#mupipIntegStopBtn').removeAttr("disabled");
+        $('#mupipIntegStartBtn').attr('disabled', 'disabled');
+        $('#mupipIntegResetBtn').attr('disabled', 'disabled');
+      }
+    },
+    mupipIntegStop: function(){
+      EWD.application.mupipIntegControl('stop');
+      toastr.warning('Force stop MUPIP INTEG');
+    },
+    mupipIntegSpawn: function(){
+      var error,fileName,targetVal,params;
+      var report = $('input[name="mupipIntegReport"]:checked').val();
+      var target = $('input[name="mupipIntegTarget"]:checked').val();
+      if(target == 'file'){
+        var fileName = $('#mupipIntegTargetFileName').val();
+        if(!fileName) {
+          error = 'Bad File Name!';
+          toastr.error(error);
+          return;
+        } else {
+          targetVal = fileName.trim();
+        }
+      } else {
+        var region = $('#mupipIntegRegionSelect').select2('data');
+        if(!region.length){
+          error = 'Select Region Name!';
+          toastr.error(error);
+          return;
+        } else {
+          var c = '',targetVal='';
+          for(i=0;i<region.length;i++) {
+            targetVal = targetVal + c + region[i].text.trim();
+            c = ',';
+          }
+        }
+      }
+      EWD.application.mupipIntegControl('start');
+      toastr.warning('DB integrity Start ...');
+
+      EWD.sockets.sendMessage({
+        type : 'mupipIntegSpawn',
+        params : { 
+                    target : target, 
+                    report : report, 
+                    targetVal: targetVal
+                 }
+      });
+
     },
     onStartup: function() {
         toastr.options.target = 'body';
+        // EWD.application.htmlDirList();
         EWD.application.initFragment();
         EWD.bootstrap3.nav.enable();
         $('#loginModal').modal({
@@ -550,7 +629,19 @@ EWD.application = {
                   EWD.application.mupipLoadCheckChange($(this).val(), $(this).prop('checked'));
                 })
             .on('click','input[name="mupipIntegTarget"]', function(event){
-                  EWD.application.mupipIntegCheckChange($(this).val());
+                  EWD.application.mupipIntegControl($(this).val());
+                })
+            .on('click','#mupipIntegResetBtn', function(event) {
+                  event.preventDefault();
+                  EWD.application.mupipIntegControl('reset');
+                })
+            .on('click','#mupipIntegStopBtn', function(event) {
+                  event.preventDefault();
+                  EWD.application.mupipIntegStop();
+                })
+            .on('click','#mupipIntegStartBtn', function(event) {
+                  event.preventDefault();
+                  EWD.application.mupipIntegSpawn();
                 })
         ;
     },
@@ -585,6 +676,11 @@ EWD.application = {
             var mess = 'error!';
             toastr.error(mess);
           }
+        }
+      },
+      mupipIntegSpawnMessage: function(messageObj){
+        if(messageObj.message.type == 'data') {
+          $('#mupipIntegLogPreArea').append(messageObj.message.retrieve);
         }
       },
       'EWD.session.deleted': function(messageObj){
