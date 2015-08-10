@@ -43,50 +43,50 @@
         <div class="navbar-collapse collapse navbar-ex1-collapse">
           <ul class="nav navbar-nav pull-right" id="navList">
             <li id="gde_Nav" data-header="gde">
-              <a href="#" data-toggle="tooltip" title="Global Directory Editor" id="gdeNavHref">GDE</a>
+              <a href="#" data-toggle="tooltip" title="Global Directory Editor" data-head="Global Dir Editor" id="gdeNavHref">GDE</a>
             </li>
             <li id="mupip_Parent" class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" id="mupipHref" data-toggle="tooltip" title="M Peripheral Interchange Program">MUPIP <span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu" id="mnuMupip">
                     <li id="mupipExtract_Nav" data-header="mupipExtract">
-                      <a href="#" data-toggle="tooltip" title="MUPIP Extract" id="mupipExtractNavHref">MUPIP Extract</a>
+                      <a href="#" data-toggle="tooltip" title="MUPIP Extract" data-head="MUPIP Extract" id="mupipExtractNavHref">MUPIP Extract</a>
                     </li>
                     <li id="mupipLoad_Nav" data-header="mupipLoad">
-                      <a href="#" data-toggle="tooltip" title="MUPIP Load" id="mupipLoadNavHref">MUPIP Load</a>
+                      <a href="#" data-toggle="tooltip" title="MUPIP Load" data-head="MUPIP Load" id="mupipLoadNavHref">MUPIP Load</a>
                     </li>
                     </li>
                     <li id="mupipInteg_Nav" data-header="mupipInteg">
-                      <a href="#" data-toggle="tooltip" title="MUPIP Integ" id="mupipIntegNavHref">MUPIP Integ</a>
+                      <a href="#" data-toggle="tooltip" title="MUPIP Integ" data-head="MUPIP Integ" id="mupipIntegNavHref">MUPIP Integ</a>
                     </li>
                 </ul>
             </li>
             <li id="lke_Nav" data-header="lke">
-              <a href="#" data-toggle="tooltip" title="M Lock Utility" id="lkeNavHref">LKE</a>
+              <a href="#" data-toggle="tooltip" title="M Lock Utility" data-head="M Lock Utils" id="lkeNavHref">LKE</a>
             </li>
             <li id="dse_Nav" data-header="dse">
-              <a href="#" data-toggle="tooltip" title="Database Structure Editor" id="dseNavHref">DSE</a>
+              <a href="#" data-toggle="tooltip" title="Database Structure Editor" data-head="DB Structure Editor" id="dseNavHref">DSE</a>
             </li>
             <li id="schedule_Nav" data-header="schedule">
-              <a href="#" data-toggle="tooltip" title="GT.M Scheduler setting" id="scheduleNavHref">Schedule</a>
+              <a href="#" data-toggle="tooltip" title="GT.M Scheduler setting" data-head="Schedule" id="scheduleNavHref">Schedule</a>
             </li>
             <li id="SysUtils_Parent" class="dropdown">   <!-- Sys Utils Menu -->
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" id="mnuSysUtilsHref" data-toggle="tooltip" title="System Utilities">Sys Utils <span class="caret"></span></a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" id="mnuSysUtilsHref" data-toggle="tooltip" title="System Utilities">Utils <span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu" id="mnuSysUtils">
                     <li id="FreeCnt_Nav" data-header="FreeCnt">
-                      <a href="#" data-toggle="tooltip" title="free blocks in the database files" id="FreeCntNavHref">%FREECNT</a>
+                      <a href="#" data-toggle="tooltip" title="free blocks in the database files" data-head="%FREECNT" id="FreeCntNavHref">%FREECNT</a>
                     </li>
                     <li id="GtmEnv_Nav" data-header="GtmEnv">
-                      <a href="#" data-toggle="tooltip" title="GT.M environment variables" id="GtmEnvNavHref">GTM env</a>
+                      <a href="#" data-toggle="tooltip" title="GT.M environment variables"  data-head="GT.M environment" id="GtmEnvNavHref">GT.M env</a>
                     </li>
                 </ul>
             </li>
             <li id="about_Nav" data-header="about">
-              <a href="#" id="aboutNavHref" data-toggle="tooltip" data-placement="bottom" title="About this system">
+              <a href="#" id="aboutNavHref" data-toggle="tooltip" data-placement="bottom" title="About this system" data-head="About">
                 <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
               </a>
             </li>
             <li>
-              <a href="#" id="btnLogout" data-toggle="tooltip" data-placement="bottom" title=" user Logout">
+              <a href="#" id="btnLogout" data-toggle="tooltip" data-placement="bottom" title=" user Logout" data-head="GT.M admTools">
                 <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
               </a>
             </li>
@@ -116,7 +116,9 @@
         </div>
       </div>
     </nav>
-
+    <!-- mupip Integ Global Detail Modal -->
+    <div id="mupipIntegGlobalDetailModal" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mupipIntegGlobalDetail" aria-hidden="true">
+    </div>
     <!-- mupip Extract GSEL Help Modal -->
     <div id="mupipExtractGSELhelpModal" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mupipExtractGSELhelpModalLabel" aria-hidden="true">
     </div>

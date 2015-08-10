@@ -74,6 +74,9 @@ EWD.bootstrap3 = {
         $('#' + current + '_Container').collapse('hide');
         $('#' + current + '_Nav').removeClass('active');
         $('#' + target + '_Nav').addClass('active');
+        var attr = $('#' + target + '_Nav a').attr('data-head');
+        $('#ewd-navbar-title-other').text(attr);
+        // console.log('******data-head = ', attr);
       }
       if (typeof EWD.application.navFragments[target] !== 'undefined') {
         var params = EWD.application.navFragments[target];

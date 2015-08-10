@@ -48,7 +48,7 @@
             <div class="form-inline">
               <label>
                 <input type="radio" name="mupipExtraOpe"
-                       id="mupipExtraOpeReg" value="Reg" />Region&nbsp;&nbsp;
+                       id="mupipExtraOpeReg" value="Region" />Region&nbsp;&nbsp;
               </label>
                 <input type="hidden" style="width: 180px;"
                        name="mupipExtraRegionSelect"
@@ -57,7 +57,7 @@
             <div class="form-inline">
               <label>
                 <input type="radio" name="mupipExtraOpe"
-                       id="mupipExtraOpeGlb" value="Glb" />Global
+                       id="mupipExtraOpeGlb" value="Select" />Select Global
               </label>
             </div>
             <div class="form-inline">
@@ -84,14 +84,26 @@
               </label>
             </div>
         </div>
-        <div class="well well-sm well-mupip well-Start">
-          <div class="row">
-            <button type="button" id="mupipExtraStartBtn" 
-                    data-extracting-text="Now extracting...." 
-                    class="btn btn-primary pull-right" 
-                    autocomplete="off">Start
-            </button>
-          </div>
+        <div class="well well-sm well-mupip well-Control">
+              <div class="btn-group" role="group">
+                <button type="button" id="mupipExtraResetBtn" 
+                        class="btn btn-primary" 
+                        autocomplete="off">Reset
+                </button>
+              </div>
+              <div class="btn-group" role="group">
+                <button type="button" id="mupipExtraStopBtn" 
+                        class="btn btn-primary"  disabled="disabled"
+                        autocomplete="off">Stop
+                </button>
+              </div>
+              <div class="btn-group" role="group">
+                <button type="button" id="mupipExtraStartBtn" 
+                        data-Extracting-text="Now doing Extract ...." 
+                        class="btn btn-primary" 
+                        autocomplete="off">Start
+                </button>
+              </div>
         </div>
       </div>
       <div class="col-xs-8">

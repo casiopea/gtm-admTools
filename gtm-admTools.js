@@ -218,45 +218,139 @@ var lkeClearExe = function(params, ewd) {
             }
         });
 };
+var resText = '';
+var integ = new Object();
 var mupipIntegSpawn = function(params, ewd) {
+
+  var gRes = new ewd.mumps.GlobalNode(
+      '%zewdSession',
+      ['session', ewd.session.sessid, 'ewd_gtmAdmTools', 'INTEG', 'result']);
+  gRes._delete();
+  resText = '';
+
   var report = '-' + params.report;
   var target = '-' + params.target + ' ' + params.targetVal;
   var command = 'mupip integ ' + report + ' ' + target;
-  console.log('****** MUPIP INTEG = ' + command);
-
-  var integ = spawn( 'mupip',  [ 'integ', report, target ] );
-
+  // console.log('****** MUPIP INTEG = ' + command);
+  integ = spawn( 'mupip',  [ 'integ', report, target ] );
   integ.stderr.on('data', function (data) {
-    // console.log('****** MUPIP INTEG stderr = ' + command + ' : stderr = ', data.toString());
+    resText += data.toString('utf8');
     ewd.sendWebSocketMsg({
         type: 'mupipIntegSpawnMessage',
-        message: { type: 'data', retrieve: data.toString() }
+        message: { type: 'data', retrieve: data.toString('utf8') }
     });
   });
   integ.on('exit', function (code) {
-    // console.log('****** MUPIP INTEG Exit = ' + command + ' : child process exited with code ' + code);
     ewd.sendWebSocketMsg({
       type: 'mupipIntegSpawnMessage',
       message: { type: 'exit', retrieve: code }
     });
+    if (code == 0) {
+      var line = [];
+      var buf = resText.split('\n');
+      for(var i=0; i<buf.length; i++){
+        if (buf[i] == '') continue;
+        line.push(buf[i].trim());
+      }
+      var label = '_';
+      var global = '';
+      for(var i=0; i < line.length; i++){
+        label = '';
+        if (line[i].match(/^Directory tree|^Global variable/)) {
+          label = line[i];
+          for(var k=0; k < 2 ; k++ ){
+            var spl = line[i+k+2].split(/\s+/);
+            var data = {
+                Level:  spl[0],  Blocks:   spl[1],   Records:  spl[2],  
+                Used:   spl[3],  Adjacent: spl[4]
+            };
+            if (label == 'Directory tree' ) {
+              gRes.$('Summary').$(label).$('data').$(k)._setDocument(data);
+            } else {
+              global = label.split(/\s+/)[2].replace('^','');
+              gRes.$('Global').$(global).$('data').$(k)._setDocument(data);
+            }
+          }
+        }
+        if (line[i].match(/integ.$/)) {
+          label = line[i];
+          for(var k=0; k < 5 ; k++ ){
+            var spl = line[i+k+2].split(/\s+/);
+            gRes.$('Summary').$(label).$('data').$(k)._setDocument({
+                Level:   spl[0],  Blocks:   spl[1],   Records:  spl[2],
+                Used:   spl[3],  Adjacent: spl[4]    });
+          }
+        }
+      }
+    }
   });
   integ.on('error', function(err) {
-    // console.log('****** MUPIP INTEG error = ' + command + ' : err = ', err);
+    console.log('****** MUPIP INTEG error = ' + err);
     ewd.sendWebSocketMsg({
-      type: 'mupipIntegSpawnMessage',
-      message: { type: 'error', retrieve: err } 
+      type: 'mupipIntegSpawnMessage', message: {type: 'error', retrieve: err} 
     });
   });
+};
+var mupipIntegForceStop = function(params, ewd) {
+  var command = process.env.gtm_dist + "/mupip stop " + integ.pid ;
+  var child = exec(command,
+      function (error, stdout, stderr){
+        if(stdout.toString()){
+          console.log('**** mupipIntegForceStop= ',stdout.toString());
+        }
+        if(stderr.toString()){
+          console.log('**** mupipIntegForceStop= ',stderr.toString());
+          /*
+          ewd.sendWebSocketMsg({
+               type: 'mupipIntegSpawnMessage',
+               message: 
+                  {
+                      exec: false,
+                      routineName : routineName,
+                      stderr: "GT.M MUPIP forced STOP\n" + stderr.toString()
+                  }
+          });
+          */
+        }
+      });
+};
+var mupipIntegResultList = function(params, ewd){
+  var res = [], sum = [];
+  var gRes = new ewd.mumps.GlobalNode( '%zewdSession',
+      ['session', ewd.session.sessid, 'ewd_gtmAdmTools', 'INTEG', 'result']);
+  gRes.$('Global')._forEach(function(node, sub){ res.push(node); });
+  gRes.$('Summary')._forEach(function(node, sub){ sum.push(node); });
+  return { result : 'ok', GSEL: res, Summary: sum };
+};
+var mupipIntegDetailGlobal = function(params, ewd){
+  var global = params.global;
+  var detail = params.detail;
+  var gRes = new ewd.mumps.GlobalNode( '%zewdSession',
+      ['session', ewd.session.sessid, 'ewd_gtmAdmTools', 'INTEG', 'result']);
+  var data = gRes.$(detail).$(global).$('data')._getDocument();
+  return { result : 'ok', data: data };
 };
 
 module.exports = {
 
   onMessage: {
-
+    mupipIntegDetailGlobal: function(params, ewd){
+      if (!ewd.session.isAuthenticated) return;
+      return mupipIntegDetailGlobal(params, ewd);
+    },
+    mupipIntegResultList: function(params, ewd){
+      if (!ewd.session.isAuthenticated) return;
+      return mupipIntegResultList(params, ewd);
+    },
     // MUPIP Integ Spawn :  call to $gtm_dist/mupip integ -.....
     mupipIntegSpawn: function(params, ewd){
       if (!ewd.session.isAuthenticated) return;
       mupipIntegSpawn(params, ewd);
+    },
+    // MUPIP Integ Force Stop by MUPIP STOP : call to $gtm_dist/mupip stop pid
+    mupipIntegForceStop: function(params, ewd){
+      if (!ewd.session.isAuthenticated) return;
+      mupipIntegForceStop(params, ewd);
     },
     getHomeDir: function(params, ewd){
       if (!ewd.session.isAuthenticated) return;
